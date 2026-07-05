@@ -316,9 +316,12 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const magicLoc = params.get('loc');
     
+    let activeLocId = selectedLocationId;
+
     if (magicLoc) {
       localStorage.setItem('ghl_location_id', magicLoc);
       setSelectedLocationId(magicLoc);
+      activeLocId = magicLoc;
       setCurrentView('call-logs');
       setIsClientMode(true);
       sessionStorage.setItem('ghl_client_mode', 'true');
@@ -329,9 +332,18 @@ export default function App() {
     setLoading(true);
     fetchLocations().then(locs => {
       setLocations(locs);
+      
+      const inClientMode = sessionStorage.getItem('ghl_client_mode') === 'true' || !!magicLoc;
+
       if (locs.length > 0) {
-        if (!selectedLocationId || !locs.find(l => l.id === selectedLocationId)) {
-          setSelectedLocationId(locs[0].id);
+        if (!activeLocId || !locs.find(l => l.id === activeLocId)) {
+          if (!inClientMode) {
+            setSelectedLocationId(locs[0].id);
+          } else {
+            // In client mode, do NOT fallback to another location.
+            // If their location is not found (or invalid), we keep it as is,
+            // the data fetch will just fail or return empty if unauthorized.
+          }
         }
         setLoading(false);
       } else {
