@@ -1,0 +1,6 @@
+{
+  "name": "Call Logs Dashboard",
+  "description": "A responsive SaaS-style Call Logs admin panel with metrics, charts, and detailed call transcripts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
