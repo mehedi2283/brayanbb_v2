@@ -28,7 +28,8 @@ function determineStatus(duration: number): 'Human Answered' | 'Voicemail' | 'No
   return 'Human Answered';
 }
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://brayanbb.aiteamtwo.com';
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://brayanbb.aiteamtwo.com';
+export const API_BASE_URL = rawBaseUrl.endsWith('/') ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
 
 export async function fetchLocations(): Promise<Location[]> {
   try {
