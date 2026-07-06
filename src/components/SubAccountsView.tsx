@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Location } from '../types';
-import { Edit2, Link as LinkIcon, Check, Copy, X, Lock } from 'lucide-react';
+import { Edit2, Check, X, Lock } from 'lucide-react';
 import { API_BASE_URL, authHeaders } from '../api';
 
 export function SubAccountsView({ 
@@ -19,9 +19,6 @@ export function SubAccountsView({
   const [editingLoc, setEditingLoc] = useState<Location | null>(null);
   const [editTokenValue, setEditTokenValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  
-  const [linkLoc, setLinkLoc] = useState<Location | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const handleSaveToken = async () => {
     if (editingLoc) {
@@ -40,18 +37,6 @@ export function SubAccountsView({
         setIsSaving(false);
       }
     }
-  };
-
-  const handleCopyLink = (loc: Location) => {
-    const url = new URL(window.location.origin);
-    url.searchParams.set('loc', loc.id);
-    navigator.clipboard.writeText(url.toString());
-    setLinkLoc(loc);
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-      setLinkLoc(null);
-    }, 2000);
   };
 
   return (
@@ -117,16 +102,6 @@ export function SubAccountsView({
                       className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
                     >
                       <Edit2 className="w-3 h-3 mr-1" /> {hasToken ? 'Update' : 'Add Token'}
-                    </button>
-                    <button 
-                      onClick={() => handleCopyLink(loc)}
-                      className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors relative"
-                    >
-                      {linkLoc?.id === loc.id && copied ? (
-                        <><Check className="w-3 h-3 mr-1 text-green-600" /> Copied!</>
-                      ) : (
-                        <><LinkIcon className="w-3 h-3 mr-1" /> Copy Magic Link</>
-                      )}
                     </button>
                   </td>
                 </tr>

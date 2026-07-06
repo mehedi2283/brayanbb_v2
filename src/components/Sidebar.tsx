@@ -102,17 +102,17 @@ export function Sidebar({ currentView, onViewChange, locations, selectedLocation
               <Users className="w-5 h-5 mr-3" />
               <span className="text-sm font-medium">Users</span>
             </a>
-
-            <a
-              href="#"
-              onClick={(e) => { e.preventDefault(); onViewChange('settings'); }}
-              className={`flex items-center px-6 py-3 group ${currentView === 'settings' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
-            >
-              <Settings className="w-5 h-5 mr-3" />
-              <span className="text-sm font-medium">Settings</span>
-            </a>
           </>
         )}
+
+        <a
+          href="#"
+          onClick={(e) => { e.preventDefault(); onViewChange('settings'); }}
+          className={`flex items-center px-6 py-3 group ${currentView === 'settings' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+        >
+          <Settings className="w-5 h-5 mr-3" />
+          <span className="text-sm font-medium">Settings</span>
+        </a>
       </nav>
 
       <div className="p-6 border-t border-slate-800 flex items-center justify-between">

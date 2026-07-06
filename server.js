@@ -109,22 +109,22 @@ function requireAdmin(req, res, next) {
 |--------------------------------------------------------------------------
 */
 
-// One-time setup to create the first admin if none exists
-app.post('/api/auth/setup', async (req, res) => {
+
+app.put('/api/auth/password', authenticateToken, async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) return res.status(400).json({ error: 'Both old and new passwords are required' });
+
   try {
-    const adminCount = await User.countDocuments({ role: 'admin' });
-    if (adminCount > 0) {
-      return res.status(400).json({ error: 'Admin already exists. Use the login route.' });
-    }
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+    const validPassword = await bcrypt.compare(oldPassword, user.password);
+    if (!validPassword) return res.status(400).json({ error: 'Incorrect old password' });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const admin = new User({ email, password: hashedPassword, role: 'admin' });
-    await admin.save();
-    
-    res.json({ success: true, message: 'First admin created successfully. You can now login.' });
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ success: true, message: 'Password updated successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

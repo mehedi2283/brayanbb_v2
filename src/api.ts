@@ -58,14 +58,14 @@ export async function login(email: string, password: string) {
   return data;
 }
 
-export async function setupAdmin(email: string, password: string) {
-  const res = await fetch(`${API_BASE_URL}/api/auth/setup`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+export async function changePassword(oldPassword: string, newPassword: string) {
+  const res = await fetch(`${API_BASE_URL}/api/auth/password`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify({ oldPassword, newPassword })
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Setup failed');
+  if (!res.ok) throw new Error(data.error || 'Failed to change password');
   return data;
 }
 

@@ -27,11 +27,12 @@ export default function App() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [currentView, setCurrentView] = useState<'call-logs' | 'sub-accounts' | 'settings' | 'users'>('call-logs');
-  const [isClientMode, setIsClientMode] = useState(false);
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string>('all');
   const [isAgentDropdownOpen, setIsAgentDropdownOpen] = useState(false);
+
+  const isClientMode = user?.role === 'client';
 
   // Lifted state from SubAccountsView
   const [tokens, setTokens] = useState<Record<string, string>>({});
@@ -42,8 +43,6 @@ export default function App() {
       setTokens({});
       return;
     }
-    
-    setIsClientMode(user.role === 'client');
     
     if (user.role === 'admin') {
       setLoadingTokens(true);
@@ -87,10 +86,11 @@ export default function App() {
             setSelectedLocationId(locs[0].id);
           }
         }
-        setLoading(false);
-      } else {
-        setLoading(false);
       }
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
     });
   }, [user, currentView]);
 
@@ -130,7 +130,14 @@ export default function App() {
   }, [selectedLocationId, currentView, tokens, user]);
 
   if (!user) {
-    return <LoginView onLoginSuccess={setUser} />;
+    return <LoginView onLoginSuccess={(userData) => {
+      setUser(userData);
+      if (userData.role === 'client') {
+        setCurrentView('call-logs');
+      } else {
+        setCurrentView('sub-accounts');
+      }
+    }} />;
   }
 
   const filteredCalls = calls.filter(call => {
@@ -194,7 +201,7 @@ export default function App() {
         
         <div className="p-5 space-y-5 overflow-auto flex-1 relative">
           {currentView === 'settings' ? (
-            <SettingsView />
+            <SettingsView user={user} />
           ) : currentView === 'sub-accounts' ? (
             <SubAccountsView 
               locations={locations} 
