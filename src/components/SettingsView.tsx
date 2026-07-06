@@ -1,13 +1,8 @@
 import { useState } from 'react';
 import { Save } from 'lucide-react';
-import { API_BASE_URL } from '../api';
+import { API_BASE_URL, authHeaders } from '../api';
 
-interface SettingsViewProps {
-  adminSecret: string;
-  setAdminSecret: (val: string) => void;
-}
-
-export function SettingsView({ adminSecret, setAdminSecret }: SettingsViewProps) {
+export function SettingsView() {
   const [agencyKey, setAgencyKey] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -18,10 +13,7 @@ export function SettingsView({ adminSecret, setAdminSecret }: SettingsViewProps)
     try {
       const res = await fetch(`${API_BASE_URL}/api/agency-key`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-admin-secret': adminSecret
-        },
+        headers: authHeaders(),
         body: JSON.stringify({ agencyApiKey: agencyKey })
       });
       const data = await res.json();
@@ -47,20 +39,6 @@ export function SettingsView({ adminSecret, setAdminSecret }: SettingsViewProps)
       </div>
       <div className="p-6 space-y-6">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Admin Secret</label>
-          <input
-            type="password"
-            value={adminSecret}
-            onChange={(e) => setAdminSecret(e.target.value)}
-            placeholder="Enter Admin Secret to authenticate"
-            className="w-full bg-white border border-slate-200 text-sm rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-          <p className="text-xs text-slate-500 mt-2">
-            Required to save configuration changes. This is the ADMIN_SECRET configured in the backend environment.
-          </p>
-        </div>
-        
-        <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">New Agency API Key</label>
           <input
             type="password"
@@ -79,11 +57,10 @@ export function SettingsView({ adminSecret, setAdminSecret }: SettingsViewProps)
             {message}
           </div>
         )}
-
         <div className="flex justify-end pt-4">
           <button
             onClick={handleSave}
-            disabled={saving || !adminSecret || !agencyKey}
+            disabled={saving || !agencyKey}
             className="flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
             <Save className="w-4 h-4 mr-2" />

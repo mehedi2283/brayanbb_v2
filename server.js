@@ -3,9 +3,12 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 4001;
+const JWT_SECRET = process.env.JWT_SECRET || 'ghl-dashboard-super-secret-key-123';
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +19,7 @@ const PORT = process.env.PORT || 4001;
 app.use(express.json({ limit: '10mb' }));
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: '*', // Allow all origins so AI Studio works. For production, set FRONTEND_URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-ghl-token', 'x-admin-secret']
 }));
@@ -47,6 +50,15 @@ mongoose.connect(mongoUri)
 |--------------------------------------------------------------------------
 */
 
+const UserSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'client'], default: 'client' },
+  locationId: { type: String } // Only required for clients
+});
+
+const User = mongoose.model('User', UserSchema);
+
 const SubAccountTokenSchema = new mongoose.Schema({
   locationId: { type: String, required: true, unique: true, index: true },
   pitToken: { type: String, required: true },
@@ -65,25 +77,115 @@ const AgencyConfig = mongoose.model('AgencyConfig', AgencyConfigSchema);
 
 /*
 |--------------------------------------------------------------------------
-| Admin Protection
+| Auth Middleware
 |--------------------------------------------------------------------------
 */
 
-function requireAdmin(req, res, next) {
-  const adminSecret = process.env.ADMIN_SECRET;
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
-  if (!adminSecret) {
-    return res.status(500).json({ error: 'ADMIN_SECRET is missing in .env' });
-  }
+  if (!token) return res.status(401).json({ error: 'Access denied. No token provided.' });
 
-  const providedSecret = req.headers['x-admin-secret'];
-
-  if (!providedSecret || providedSecret !== adminSecret) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  next();
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid token.' });
+    req.user = user;
+    next();
+  });
 }
+
+function requireAdmin(req, res, next) {
+  authenticateToken(req, res, () => {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required.' });
+    }
+    next();
+  });
+}
+
+/*
+|--------------------------------------------------------------------------
+| Auth Routes
+|--------------------------------------------------------------------------
+*/
+
+// One-time setup to create the first admin if none exists
+app.post('/api/auth/setup', async (req, res) => {
+  try {
+    const adminCount = await User.countDocuments({ role: 'admin' });
+    if (adminCount > 0) {
+      return res.status(400).json({ error: 'Admin already exists. Use the login route.' });
+    }
+
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const admin = new User({ email, password: hashedPassword, role: 'admin' });
+    await admin.save();
+    
+    res.json({ success: true, message: 'First admin created successfully. You can now login.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) return res.status(400).json({ error: 'Invalid credentials' });
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role, locationId: user.locationId },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: { email: user.email, role: user.role, locationId: user.locationId }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/users', requireAdmin, async (req, res) => {
+  try {
+    const users = await User.find({}, '-password'); // Exclude passwords
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/users', requireAdmin, async (req, res) => {
+  const { email, password, role, locationId } = req.body;
+  try {
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(400).json({ error: 'User already exists' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ email, password: hashedPassword, role: role || 'client', locationId });
+    await user.save();
+    res.json({ success: true, message: 'User created successfully', user: { email: user.email, role: user.role, locationId: user.locationId } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/users/:email', requireAdmin, async (req, res) => {
+  try {
+    await User.findOneAndDelete({ email: req.params.email });
+    res.json({ success: true, message: 'User deleted' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -115,13 +217,9 @@ function maskToken(token) {
 
 /*
 |--------------------------------------------------------------------------
-| Routes
+| Config & Token Routes (Admin Only)
 |--------------------------------------------------------------------------
 */
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Backend server is running' });
-});
 
 app.get('/api/agency-key/status', requireAdmin, async (req, res) => {
   try {
@@ -200,7 +298,13 @@ app.post('/api/tokens/:locationId', requireAdmin, async (req, res) => {
   }
 });
 
-app.get('/api/locations', async (req, res) => {
+/*
+|--------------------------------------------------------------------------
+| Protected GHL Routes
+|--------------------------------------------------------------------------
+*/
+
+app.get('/api/locations', authenticateToken, async (req, res) => {
   try {
     const token = await getAgencyToken();
     if (!token) return res.status(401).json({ error: 'No Agency API Key configured' });
@@ -216,6 +320,13 @@ app.get('/api/locations', async (req, res) => {
 
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json(data);
+    
+    // If the user is a client, only return their specific location
+    if (req.user.role === 'client') {
+      const clientLocation = data.locations?.find(loc => loc.id === req.user.locationId);
+      return res.json({ locations: clientLocation ? [clientLocation] : [] });
+    }
+
     res.json(data);
   } catch (err) {
     console.error('Failed to fetch locations:', err);
@@ -223,9 +334,14 @@ app.get('/api/locations', async (req, res) => {
   }
 });
 
-app.get('/api/call-logs', async (req, res) => {
+app.get('/api/call-logs', authenticateToken, async (req, res) => {
   const { locationId } = req.query;
   if (!locationId || typeof locationId !== 'string') return res.status(400).json({ error: 'locationId is required' });
+
+  // Security check: Clients can only access their own location
+  if (req.user.role === 'client' && req.user.locationId !== locationId) {
+    return res.status(403).json({ error: 'Forbidden. You can only view your own location.' });
+  }
 
   try {
     const pitToken = await getLocationToken(locationId);
@@ -250,9 +366,14 @@ app.get('/api/call-logs', async (req, res) => {
   }
 });
 
-app.get('/api/agents', async (req, res) => {
+app.get('/api/agents', authenticateToken, async (req, res) => {
   const { locationId } = req.query;
   if (!locationId || typeof locationId !== 'string') return res.status(400).json({ error: 'locationId is required' });
+
+  // Security check: Clients can only access their own location
+  if (req.user.role === 'client' && req.user.locationId !== locationId) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
 
   try {
     const pitToken = await getLocationToken(locationId);

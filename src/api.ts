@@ -31,9 +31,47 @@ function determineStatus(duration: number): 'Human Answered' | 'Voicemail' | 'No
 const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://brayanbb.aiteamtwo.com';
 export const API_BASE_URL = rawBaseUrl.endsWith('/') ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
 
+export function authHeaders() {
+  const token = sessionStorage.getItem('ghl_auth_token') || localStorage.getItem('ghl_auth_token');
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+export async function login(email: string, password: string) {
+  const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Login failed');
+  
+  // Store token
+  sessionStorage.setItem('ghl_auth_token', data.token);
+  sessionStorage.setItem('ghl_user', JSON.stringify(data.user));
+  
+  return data;
+}
+
+export async function setupAdmin(email: string, password: string) {
+  const res = await fetch(`${API_BASE_URL}/api/auth/setup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Setup failed');
+  return data;
+}
+
 export async function fetchLocations(): Promise<Location[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/locations`);
+    const res = await fetch(`${API_BASE_URL}/api/locations`, { headers: authHeaders() });
     if (!res.ok) throw new Error('Failed to fetch locations');
     const data = await res.json();
     
@@ -56,7 +94,7 @@ export interface Agent {
 
 export async function fetchAgents(locationId: string): Promise<Agent[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/agents?locationId=${locationId}`);
+    const res = await fetch(`${API_BASE_URL}/api/agents?locationId=${locationId}`, { headers: authHeaders() });
     const data = await res.json();
     
     if (!res.ok) {
@@ -79,7 +117,7 @@ export async function fetchAgents(locationId: string): Promise<Agent[]> {
 export async function fetchCallLogs(locationId: string): Promise<CallLog[]> {
   if (!locationId) return [];
   try {
-    const res = await fetch(`${API_BASE_URL}/api/call-logs?locationId=${locationId}`);
+    const res = await fetch(`${API_BASE_URL}/api/call-logs?locationId=${locationId}`, { headers: authHeaders() });
     const data = await res.json();
     
     if (!res.ok) {

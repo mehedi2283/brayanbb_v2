@@ -1,10 +1,10 @@
-import { Phone, Settings, Building, ChevronDown } from 'lucide-react';
+import { Phone, Settings, Building, ChevronDown, Users } from 'lucide-react';
 import { Location } from '../types';
 import { useState, useRef, useEffect } from 'react';
 
 interface SidebarProps {
-  currentView: 'call-logs' | 'sub-accounts' | 'settings';
-  onViewChange: (view: 'call-logs' | 'sub-accounts' | 'settings') => void;
+  currentView: 'call-logs' | 'sub-accounts' | 'settings' | 'users';
+  onViewChange: (view: 'call-logs' | 'sub-accounts' | 'settings' | 'users') => void;
   locations: Location[];
   selectedLocationId: string;
   onLocationChange: (id: string) => void;
@@ -82,6 +82,7 @@ export function Sidebar({ currentView, onViewChange, locations, selectedLocation
           <Phone className="w-5 h-5 mr-3" />
           <span className="text-sm font-medium">Call Logs</span>
         </a>
+        
         {!isClientMode && (
           <>
             <a
@@ -92,6 +93,16 @@ export function Sidebar({ currentView, onViewChange, locations, selectedLocation
               <Building className="w-5 h-5 mr-3" />
               <span className="text-sm font-medium">Sub-Accounts</span>
             </a>
+            
+            <a
+              href="#"
+              onClick={(e) => { e.preventDefault(); onViewChange('users'); }}
+              className={`flex items-center px-6 py-3 group ${currentView === 'users' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+            >
+              <Users className="w-5 h-5 mr-3" />
+              <span className="text-sm font-medium">Users</span>
+            </a>
+
             <a
               href="#"
               onClick={(e) => { e.preventDefault(); onViewChange('settings'); }}
@@ -103,9 +114,10 @@ export function Sidebar({ currentView, onViewChange, locations, selectedLocation
           </>
         )}
       </nav>
+
       <div className="p-6 border-t border-slate-800 flex items-center justify-between">
         <div className="text-slate-400 text-xs italic">
-          GHL Admin v2.5
+          GHL Admin v3.0
         </div>
       </div>
     </aside>
