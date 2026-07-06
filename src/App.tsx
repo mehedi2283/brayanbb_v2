@@ -129,17 +129,6 @@ export default function App() {
     }
   }, [selectedLocationId, currentView, tokens, user]);
 
-  if (!user) {
-    return <LoginView onLoginSuccess={(userData) => {
-      setUser(userData);
-      if (userData.role === 'client') {
-        setCurrentView('call-logs');
-      } else {
-        setCurrentView('sub-accounts');
-      }
-    }} />;
-  }
-
   const filteredCalls = calls.filter(call => {
     if (dateRange[0] && dateRange[1]) {
       const callDate = new Date(call.createdAt);
@@ -175,6 +164,17 @@ export default function App() {
       failed
     };
   }, [filteredCalls]);
+
+  if (!user) {
+    return <LoginView onLoginSuccess={(userData) => {
+      setUser(userData);
+      if (userData.role === 'client') {
+        setCurrentView('call-logs');
+      } else {
+        setCurrentView('sub-accounts');
+      }
+    }} />;
+  }
 
   return (
     <div className="flex h-screen w-full bg-[#F8FAFC] font-sans overflow-hidden text-slate-800">

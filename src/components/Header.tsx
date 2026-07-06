@@ -17,21 +17,25 @@ export function Header({ isClientMode, dateRange, setDateRange, user, onLogout }
       <div className="flex-1"></div>
       
       <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 transition-colors group relative">
+        <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 transition-colors group relative w-[250px] shrink-0">
           <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-          <DatePicker
-            selectsRange={true}
-            startDate={startDate ?? undefined}
-            endDate={endDate ?? undefined}
-            onChange={(update) => setDateRange(update)}
-            dateFormat="MMM d, yyyy"
-            className="bg-transparent text-sm text-slate-600 font-medium outline-none border-none focus:ring-0 p-0 w-44 text-center cursor-pointer pr-4"
-            placeholderText="Select date range"
-          />
+          <div className="flex-1 min-w-0">
+            <DatePicker
+              selectsRange={true}
+              startDate={startDate ?? undefined}
+              endDate={endDate ?? undefined}
+              onChange={(update) => setDateRange(update)}
+              dateFormat="MMM d, yyyy"
+              className="bg-transparent text-sm text-slate-600 font-medium outline-none border-none focus:ring-0 p-0 w-full text-left cursor-pointer caret-transparent select-none pr-6 truncate"
+              wrapperClassName="w-full"
+              placeholderText="Select date range"
+              onChangeRaw={(e) => e.preventDefault()}
+            />
+          </div>
           {(startDate || endDate) && (
             <button 
               onClick={() => setDateRange([null, null])} 
-              className="absolute right-2 text-slate-400 hover:text-slate-600 transition-colors bg-slate-100 hover:bg-slate-200 rounded-full p-0.5 flex items-center justify-center"
+              className="absolute right-2 text-slate-400 hover:text-slate-600 transition-colors bg-slate-100 hover:bg-slate-200 rounded-full p-0.5 flex items-center justify-center z-10"
               title="Clear date range"
             >
               <X className="w-3 h-3" />
