@@ -65,6 +65,7 @@ function CustomSelect({
           ))}
         </div>
       )}
+
     </div>
   );
 }
@@ -74,6 +75,7 @@ export function UsersView({ locations }: { locations: Location[] }) {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
   const [success, setSuccess] = useState('');
 
   // Form
@@ -126,15 +128,21 @@ export function UsersView({ locations }: { locations: Location[] }) {
   };
 
   const handleDeleteUser = async (userEmail: string) => {
-    if (!confirm(t('users.deleteConfirm', { email: userEmail }))) return;
+    setDeletingUser(userEmail);
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!deletingUser) return;
     try {
-      await fetch(`${API_BASE_URL}/api/users/${encodeURIComponent(userEmail)}`, {
+      await fetch(`${API_BASE_URL}/api/users/${encodeURIComponent(deletingUser)}`, {
         method: 'DELETE',
         headers: authHeaders()
       });
       fetchUsers();
     } catch (err) {
       console.error(err);
+    } finally {
+      setDeletingUser(null);
     }
   };
 
@@ -225,6 +233,33 @@ export function UsersView({ locations }: { locations: Location[] }) {
           </table>
         </div>
       </div>
+
+      {deletingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">{t('users.delete')}</h3>
+              <p className="text-sm text-slate-500">
+                {t('users.deleteConfirm', { email: deletingUser })}
+              </p>
+            </div>
+            <div className="bg-slate-50 px-6 py-4 flex justify-end space-x-3 border-t border-slate-100">
+              <button
+                onClick={() => setDeletingUser(null)}
+                className="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                {t('modal.cancel')}
+              </button>
+              <button
+                onClick={confirmDeleteUser}
+                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+              >
+                {t('users.delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
