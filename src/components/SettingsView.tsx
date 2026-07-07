@@ -1,3 +1,4 @@
+import { useLanguage } from '../contexts/LanguageContext';
 import { useState } from 'react';
 import { Save, Lock } from 'lucide-react';
 import { API_BASE_URL, authHeaders, changePassword } from '../api';
@@ -7,6 +8,7 @@ interface SettingsViewProps {
 }
 
 export function SettingsView({ user }: SettingsViewProps) {
+  const { t, language, setLanguage } = useLanguage();
   const [agencyKey, setAgencyKey] = useState('');
   const [savingKey, setSavingKey] = useState(false);
   const [keyMessage, setKeyMessage] = useState('');
@@ -27,14 +29,14 @@ export function SettingsView({ user }: SettingsViewProps) {
       });
       const data = await res.json();
       if (res.ok) {
-        setKeyMessage('Agency API Key saved successfully.');
+        setKeyMessage(t('settings.keySaved'));
         setAgencyKey('');
       } else {
-        setKeyMessage(data.error || 'Failed to save Agency API Key.');
+        setKeyMessage(data.error || t('settings.keyFailed'));
       }
     } catch (err) {
       console.error(err);
-      setKeyMessage('Error saving key.');
+      setKeyMessage(t('settings.keyError'));
     } finally {
       setSavingKey(false);
     }
@@ -46,11 +48,11 @@ export function SettingsView({ user }: SettingsViewProps) {
     setPasswordMessage('');
     try {
       await changePassword(oldPassword, newPassword);
-      setPasswordMessage('Password updated successfully.');
+      setPasswordMessage(t('settings.passwordSaved'));
       setOldPassword('');
       setNewPassword('');
     } catch (err: any) {
-      setPasswordMessage(err.message || 'Failed to change password.');
+      setPasswordMessage(err.message || t('settings.passwordFailed'));
     } finally {
       setSavingPassword(false);
     }
@@ -61,22 +63,20 @@ export function SettingsView({ user }: SettingsViewProps) {
       {user?.role === 'admin' && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-100">
-            <h2 className="text-xl font-semibold text-slate-800">Agency Settings</h2>
-            <p className="text-sm text-slate-500 mt-1">Configure your GoHighLevel Agency API settings securely.</p>
+            <h2 className="text-xl font-semibold text-slate-800">{t("settings.agencySettings")}</h2>
+            <p className="text-sm text-slate-500 mt-1">{t("settings.agencySettingsDesc")}</p>
           </div>
           <div className="p-6 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">New Agency API Key</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">{t("settings.newAgencyKey")}</label>
               <input
                 type="password"
                 value={agencyKey}
                 onChange={(e) => setAgencyKey(e.target.value)}
-                placeholder="Enter new Agency API Key to update"
+                placeholder={t("settings.newAgencyKeyPlaceholder")}
                 className="w-full bg-white border border-slate-200 text-sm rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
               />
-              <p className="text-xs text-slate-500 mt-2">
-                This key is used to fetch the list of sub-accounts from GoHighLevel. For security, the current key is not displayed.
-              </p>
+              <p className="text-xs text-slate-500 mt-2">{t("settings.agencyKeyHint")}</p>
             </div>
             
             {keyMessage && (
@@ -92,7 +92,7 @@ export function SettingsView({ user }: SettingsViewProps) {
                 className="flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {savingKey ? 'Saving...' : 'Save Settings'}
+                {savingKey ? t('settings.saving') : t('settings.saveSettings')}
               </button>
             </div>
           </div>
@@ -101,30 +101,30 @@ export function SettingsView({ user }: SettingsViewProps) {
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 border-b border-slate-100">
-          <h2 className="text-xl font-semibold text-slate-800">Security</h2>
-          <p className="text-sm text-slate-500 mt-1">Update your account password.</p>
+          <h2 className="text-xl font-semibold text-slate-800">{t("settings.security")}</h2>
+          <p className="text-sm text-slate-500 mt-1">{t("settings.securityDesc")}</p>
         </div>
         <div className="p-6">
           <form onSubmit={handleUpdatePassword} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Old Password</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">{t("settings.oldPassword")}</label>
               <input
                 required
                 type="password"
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
-                placeholder="Current password"
+                placeholder={t("settings.oldPasswordPlaceholder")}
                 className="w-full bg-white border border-slate-200 text-sm rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">New Password</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">{t("settings.newPassword")}</label>
               <input
                 required
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="New password"
+                placeholder={t("settings.newPasswordPlaceholder")}
                 className="w-full bg-white border border-slate-200 text-sm rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
@@ -142,7 +142,7 @@ export function SettingsView({ user }: SettingsViewProps) {
                 className="flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
                 <Lock className="w-4 h-4 mr-2" />
-                {savingPassword ? 'Updating...' : 'Update Password'}
+                {savingPassword ? t('settings.updating') : t('settings.updatePassword')}
               </button>
             </div>
           </form>

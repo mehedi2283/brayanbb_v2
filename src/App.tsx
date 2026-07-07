@@ -9,11 +9,14 @@ import { SettingsView } from './components/SettingsView';
 import { SubAccountsView } from './components/SubAccountsView';
 import { UsersView } from './components/UsersView';
 import { LoginView } from './components/LoginView';
+import { ConfigureTokenModal } from './components/ConfigureTokenModal';
+import { useLanguage } from './contexts/LanguageContext';
 import { fetchLocations, fetchCallLogs, API_BASE_URL, fetchAgents, Agent, authHeaders } from './api';
 import { CallLog, Location } from './types';
 import { Lock, ChevronDown, UserCheck } from 'lucide-react';
 
 export default function App() {
+  const { t } = useLanguage();
   const [user, setUser] = useState<any>(() => {
     const saved = sessionStorage.getItem('ghl_user');
     return saved ? JSON.parse(saved) : null;
@@ -31,6 +34,7 @@ export default function App() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string>('all');
   const [isAgentDropdownOpen, setIsAgentDropdownOpen] = useState(false);
+  const [isConfigureModalOpen, setIsConfigureModalOpen] = useState(false);
 
   const isClientMode = user?.role === 'client';
 
@@ -220,13 +224,13 @@ export default function App() {
                     <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 shadow-sm">
                       <Lock className="w-8 h-8" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800 mb-2">Access Error</h3>
+                    <h3 className="text-lg font-bold text-slate-800 mb-2">{t("app.accessError")}</h3>
                     <p className="text-sm text-slate-600 mb-6">
                       {errorMsg}
                     </p>
                     {!isClientMode && (
                       <button 
-                        onClick={() => setCurrentView('sub-accounts')}
+                        onClick={() => setIsConfigureModalOpen(true)}
                         className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                       >
                         Configure API Token
@@ -237,7 +241,7 @@ export default function App() {
               ) : loading ? (
                  <div className="flex flex-col items-center justify-center h-[60vh] w-full">
                     <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-slate-500 text-sm font-medium">Loading call logs...</p>
+                    <p className="text-slate-500 text-sm font-medium">{t("app.loadingCallLogs")}</p>
                  </div>
               ) : (
                 <>
@@ -250,7 +254,7 @@ export default function App() {
                           className="bg-white border border-slate-200 text-sm rounded-md px-3 py-1.5 font-medium outline-none focus:border-blue-500 flex items-center justify-between min-w-[140px]"
                         >
                           <span className="truncate">
-                            {selectedAgentId === 'all' ? 'All Agents' : agents.find(a => a.id === selectedAgentId)?.name || 'Unknown Agent'}
+                            {selectedAgentId === 'all' ? t('app.allAgents') : agents.find(a => a.id === selectedAgentId)?.name || t('app.unknownAgent')}
                           </span>
                           <ChevronDown className="w-4 h-4 text-slate-500 ml-2" />
                         </button>
@@ -274,14 +278,14 @@ export default function App() {
                           </div>
                         )}
                       </div>
-                      <div className="text-xs text-slate-400 font-medium">Total {filteredCalls.length} records found</div>
+                      <div className="text-xs text-slate-400 font-medium">{t('app.totalRecords', { count: filteredCalls.length })}</div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-4">
-                    <MetricCard title="Attempted Calls" value={metrics.attempted} />
-                    <MetricCard title="Connected Calls" value={metrics.connected} />
-                    <MetricCard title="Actions Triggered" value={metrics.actionsTriggered} />
+                    <MetricCard title={t("metrics.attempted")} value={metrics.attempted} />
+                    <MetricCard title={t("metrics.connected")} value={metrics.connected} />
+                    <MetricCard title={t("metrics.actions")} value={metrics.actionsTriggered} />
                   </div>
 
                   <ChartRow 
@@ -304,6 +308,18 @@ export default function App() {
       </main>
 
       <SummaryModal call={selectedCall} onClose={() => setSelectedCall(null)} />
+      
+      {isConfigureModalOpen && selectedLocationId && locations.find(l => l.id === selectedLocationId) && (
+        <ConfigureTokenModal 
+          location={locations.find(l => l.id === selectedLocationId)!}
+          onClose={() => setIsConfigureModalOpen(false)}
+          onSuccess={() => {
+            setTokens(prev => ({ ...prev, [selectedLocationId]: 'configured' }));
+            setIsConfigureModalOpen(false);
+            // Optionally, we could trigger a refresh here, but updating tokens triggers useEffect anyway
+          }}
+        />
+      )}
     </div>
   );
 }

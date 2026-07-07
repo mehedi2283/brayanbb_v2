@@ -2,6 +2,7 @@ import { X } from 'lucide-react';
 import { useState } from 'react';
 import { CallLog } from '../types';
 import { cn } from '../lib/utils';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface SummaryModalProps {
   call: CallLog | null;
@@ -15,6 +16,7 @@ function formatDuration(seconds: number) {
 }
 
 export function SummaryModal({ call, onClose }: SummaryModalProps) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'summary' | 'transcript'>('summary');
 
   if (!call) return null;
@@ -23,7 +25,7 @@ export function SummaryModal({ call, onClose }: SummaryModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/50 backdrop-blur-sm">
       <div className="w-[450px] h-full bg-white shadow-2xl flex flex-col transform transition-transform animate-in slide-in-from-right">
         <div className="flex items-center justify-between p-4 border-b border-slate-200">
-          <h2 className="text-lg font-bold text-slate-800">Call Details</h2>
+          <h2 className="text-lg font-bold text-slate-800">{t("summaryModal.callDetails")}</h2>
           <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-md text-slate-500">
             <X className="w-5 h-5" />
           </button>
@@ -36,7 +38,7 @@ export function SummaryModal({ call, onClose }: SummaryModalProps) {
               activeTab === 'summary' ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-700"
             )}
           >
-            Summary
+            {t("summaryModal.summaryTab")}
           </button>
           <button 
             onClick={() => setActiveTab('transcript')}
@@ -44,7 +46,7 @@ export function SummaryModal({ call, onClose }: SummaryModalProps) {
               activeTab === 'transcript' ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-700"
             )}
           >
-            Transcript
+            {t("summaryModal.transcriptTab")}
           </button>
         </div>
 
@@ -52,25 +54,25 @@ export function SummaryModal({ call, onClose }: SummaryModalProps) {
           {activeTab === 'summary' && (
             <>
               <div className="space-y-2">
-                <h3 className="text-xs font-bold text-slate-400 uppercase">Summary</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase">{t("summaryModal.summaryTab")}</h3>
                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-sm text-slate-700">
-                  {call.summary || 'No summary available.'}
+                  {call.summary || t('summaryModal.noSummary')}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-xs font-bold text-slate-400 uppercase">Metadata</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase">{t("summaryModal.metadata")}</h3>
                 <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs">
-                  <div><span className="text-slate-500 block mb-1">Agent ID</span><span className="font-medium text-slate-800">{call.agentId}</span></div>
-                  <div><span className="text-slate-500 block mb-1">Contact ID</span><span className="font-medium text-slate-800">{call.contactId}</span></div>
-                  <div><span className="text-slate-500 block mb-1">Duration</span><span className="font-medium text-slate-800">{formatDuration(call.duration)}</span></div>
-                  <div><span className="text-slate-500 block mb-1">Trial Call</span><span className="font-medium text-slate-800">{call.trialCall ? 'Yes' : 'No'}</span></div>
+                  <div><span className="text-slate-500 block mb-1">{t("summaryModal.agentId")}</span><span className="font-medium text-slate-800">{call.agentId}</span></div>
+                  <div><span className="text-slate-500 block mb-1">{t("summaryModal.contactId")}</span><span className="font-medium text-slate-800">{call.contactId}</span></div>
+                  <div><span className="text-slate-500 block mb-1">{t("summaryModal.duration")}</span><span className="font-medium text-slate-800">{formatDuration(call.duration)}</span></div>
+                  <div><span className="text-slate-500 block mb-1">{t("summaryModal.trialCall")}</span><span className="font-medium text-slate-800">{call.trialCall ? t('summaryModal.yes') : t('summaryModal.no')}</span></div>
                 </div>
               </div>
 
               {Object.keys(call.extractedData).length > 0 && (
                 <div className="space-y-2">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase">Extracted Data</h3>
+                  <h3 className="text-xs font-bold text-slate-400 uppercase">{t("summaryModal.extractedData")}</h3>
                   <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs space-y-2">
                     {Object.entries(call.extractedData).map(([key, value]) => (
                       <div key={key} className="flex justify-between">
@@ -86,7 +88,7 @@ export function SummaryModal({ call, onClose }: SummaryModalProps) {
 
           {activeTab === 'transcript' && (
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-slate-400 uppercase">Transcript</h3>
+              <h3 className="text-xs font-bold text-slate-400 uppercase">{t("summaryModal.transcriptTab")}</h3>
               <div className="space-y-4">
                 {call.transcript.length > 0 ? call.transcript.map((msg, idx) => (
                   <div key={idx} className={`flex flex-col ${msg.role === 'bot' ? 'items-start' : 'items-end'}`}>
@@ -100,7 +102,7 @@ export function SummaryModal({ call, onClose }: SummaryModalProps) {
                     <span className="text-[10px] text-slate-400 mt-1">{msg.timestamp}</span>
                   </div>
                 )) : (
-                  <div className="text-sm text-slate-500 italic">No transcript available.</div>
+                  <div className="text-sm text-slate-500 italic">{t("summaryModal.noTranscript")}</div>
                 )}
               </div>
             </div>

@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { CallLog } from '../types';
 import { cn } from '../lib/utils';
 import { Agent } from '../api';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface CallsTableProps {
   calls: CallLog[];
@@ -25,6 +26,7 @@ function formatDuration(seconds: number) {
 }
 
 export function CallsTable({ calls, agents, onOpenSummary }: CallsTableProps) {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   
   const filteredCalls = calls.filter(call => 
@@ -33,7 +35,7 @@ export function CallsTable({ calls, agents, onOpenSummary }: CallsTableProps) {
 
   const getAgentName = (agentId: string) => {
     const agent = agents.find(a => a.id === agentId);
-    return agent ? agent.name : 'Unknown Agent';
+    return agent ? agent.name : t("app.unknownAgent");
   };
 
   return (
@@ -43,13 +45,13 @@ export function CallsTable({ calls, agents, onOpenSummary }: CallsTableProps) {
           <button 
             className="px-4 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600"
           >
-            Attempted
+            {t("metrics.attempted")}
           </button>
         </div>
         <div className="flex items-center space-x-2 py-2">
           <input 
             type="text" 
-            placeholder="Search contact..." 
+            placeholder={t("callsTable.search")} 
             className="text-xs border border-slate-300 rounded px-3 py-1.5 w-48 outline-none focus:border-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -60,12 +62,12 @@ export function CallsTable({ calls, agents, onOpenSummary }: CallsTableProps) {
         <table className="w-full text-left border-collapse table-fixed min-w-[900px]">
           <thead className="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase sticky top-0">
             <tr className="border-b border-slate-200">
-              <th className="px-4 py-3">Contact Name</th>
-              <th className="px-4 py-3">Agent</th>
-              <th className="px-4 py-3 w-32">Status</th>
-              <th className="px-4 py-3">Date & Time</th>
-              <th className="px-4 py-3 w-20">Duration</th>
-              <th className="px-4 py-3">Call Direction</th>
+              <th className="px-4 py-3">{t("callsTable.contact")}</th>
+              <th className="px-4 py-3">{t("callsTable.agent")}</th>
+              <th className="px-4 py-3 w-32">{t("callsTable.status")}</th>
+              <th className="px-4 py-3">{t("callsTable.date")}</th>
+              <th className="px-4 py-3 w-20">{t("callsTable.duration")}</th>
+              <th className="px-4 py-3">{t("callsTable.actions")}</th>
               <th className="px-4 py-3 w-32 text-right"></th>
             </tr>
           </thead>
@@ -94,14 +96,14 @@ export function CallsTable({ calls, agents, onOpenSummary }: CallsTableProps) {
             ))}
             {filteredCalls.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-slate-500">No calls found</td>
+                <td colSpan={7} className="px-4 py-8 text-center text-slate-500">{t("callsTable.noCalls")}</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
       <div className="h-12 border-t border-slate-200 flex items-center justify-between px-4 shrink-0 bg-slate-50/50">
-        <span className="text-xs text-slate-500 font-medium">Showing 1 to {filteredCalls.length} of {filteredCalls.length} results</span>
+        <span className="text-xs text-slate-500 font-medium">{t("callsTable.showing", { count: filteredCalls.length, total: filteredCalls.length })}</span>
         <div className="flex space-x-1">
           <button className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded text-slate-400">&laquo;</button>
           <button className="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded font-bold">1</button>

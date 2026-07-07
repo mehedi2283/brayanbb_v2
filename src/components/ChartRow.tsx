@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface ChartRowProps {
   humanAnswered: number;
@@ -15,12 +16,13 @@ const COLORS = {
 };
 
 export function ChartRow({ humanAnswered, voicemail, noAnswer, failed }: ChartRowProps) {
+  const { t } = useLanguage();
   const total = humanAnswered + voicemail + noAnswer + failed;
   const data = [
-    { name: 'Human Answered', value: humanAnswered, color: COLORS['Human Answered'] },
-    { name: 'Voicemail', value: voicemail, color: COLORS['Voicemail'] },
-    { name: 'No Answer', value: noAnswer, color: COLORS['No Answer'] },
-    { name: 'Failed', value: failed, color: COLORS['Failed'] },
+    { name: t('chart.humanAnswered'), value: humanAnswered, color: COLORS['Human Answered'] },
+    { name: t('chart.voicemail'), value: voicemail, color: COLORS['Voicemail'] },
+    { name: t('chart.noAnswer'), value: noAnswer, color: COLORS['No Answer'] },
+    { name: t('chart.failed'), value: failed, color: COLORS['Failed'] },
   ];
 
   return (
@@ -50,7 +52,7 @@ export function ChartRow({ humanAnswered, voicemail, noAnswer, failed }: ChartRo
           </div>
         </div>
         <div className="space-y-1">
-          <div className="text-xs font-bold mb-2">STATUS DISTRIBUTION</div>
+          <div className="text-xs font-bold mb-2">{t("chart.callOutcomes")}</div>
           {data.map((item) => (
             <div key={item.name} className="flex items-center text-xs space-x-2 font-medium text-slate-600">
               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
