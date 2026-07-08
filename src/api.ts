@@ -150,3 +150,19 @@ export async function fetchCallLogs(locationId: string): Promise<CallLog[]> {
     throw error;
   }
 }
+
+
+export async function saveTutorialComplete(email: string): Promise<void> {
+  try {
+    await fetch(`${API_BASE_URL}/api/users/tutorial`, {
+      method: 'POST',
+      headers: {
+        ...authHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    });
+  } catch (err) {
+    console.error('Failed to save tutorial status:', err);
+  }
+}

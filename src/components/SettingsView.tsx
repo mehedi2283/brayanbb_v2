@@ -5,9 +5,10 @@ import { API_BASE_URL, authHeaders, changePassword } from '../api';
 
 interface SettingsViewProps {
   user: any;
+  onRestartTutorial: () => void;
 }
 
-export function SettingsView({ user }: SettingsViewProps) {
+export function SettingsView({ user, onRestartTutorial }: SettingsViewProps) {
   const { t, language, setLanguage } = useLanguage();
   const [agencyKey, setAgencyKey] = useState('');
   const [savingKey, setSavingKey] = useState(false);
@@ -60,6 +61,22 @@ export function SettingsView({ user }: SettingsViewProps) {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto mt-6">
+
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-800">{t("settings.help")}</h2>
+            <p className="text-sm text-slate-500 mt-1">{t("settings.helpDesc")}</p>
+          </div>
+          <button
+            onClick={onRestartTutorial}
+            className="px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 text-sm font-medium rounded-md transition-colors"
+          >
+            {t("tutorial.start")}
+          </button>
+        </div>
+      </div>
+
       {user?.role === 'admin' && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-100">

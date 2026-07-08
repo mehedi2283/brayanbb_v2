@@ -38,7 +38,7 @@ export function Sidebar({ currentView, onViewChange, locations, selectedLocation
         <span className="text-white font-semibold text-lg tracking-tight">{t("sidebar.title")}</span>
       </div>
       
-      <div className="px-6 mb-4 relative" ref={dropdownRef}>
+      <div className="px-6 mb-4 relative tour-subaccount-select" ref={dropdownRef}>
         <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block">{t("sidebar.subAccount")}</label>
         <button
           className={`w-full bg-[#1E293B] border border-slate-700 text-slate-200 text-sm rounded-md px-3 py-2 outline-none flex items-center justify-between transition-colors ${isClientMode ? 'opacity-50 cursor-not-allowed' : 'hover:border-slate-600 focus:border-blue-500'}`}
@@ -75,7 +75,7 @@ export function Sidebar({ currentView, onViewChange, locations, selectedLocation
         <a
           href="#"
           onClick={(e) => { e.preventDefault(); onViewChange('call-logs'); }}
-          className={`flex items-center px-6 py-3 group ${currentView === 'call-logs' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+          className={`flex items-center px-6 py-3 group tour-nav-call-logs ${currentView === 'call-logs' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
         >
           <Phone className="w-5 h-5 mr-3" />
           <span className="text-sm font-medium">{t('nav.callLogs')}</span>
@@ -86,7 +86,7 @@ export function Sidebar({ currentView, onViewChange, locations, selectedLocation
             <a
               href="#"
               onClick={(e) => { e.preventDefault(); onViewChange('sub-accounts'); }}
-              className={`flex items-center px-6 py-3 group ${currentView === 'sub-accounts' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+              className={`flex items-center px-6 py-3 group tour-nav-sub-accounts ${currentView === 'sub-accounts' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
             >
               <Building className="w-5 h-5 mr-3" />
               <span className="text-sm font-medium">{t('nav.subAccounts')}</span>
@@ -95,7 +95,7 @@ export function Sidebar({ currentView, onViewChange, locations, selectedLocation
             <a
               href="#"
               onClick={(e) => { e.preventDefault(); onViewChange('users'); }}
-              className={`flex items-center px-6 py-3 group ${currentView === 'users' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+              className={`flex items-center px-6 py-3 group tour-nav-users ${currentView === 'users' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
             >
               <Users className="w-5 h-5 mr-3" />
               <span className="text-sm font-medium">{t('nav.users')}</span>
@@ -106,7 +106,7 @@ export function Sidebar({ currentView, onViewChange, locations, selectedLocation
         <a
           href="#"
           onClick={(e) => { e.preventDefault(); onViewChange('settings'); }}
-          className={`flex items-center px-6 py-3 group ${currentView === 'settings' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+          className={`flex items-center px-6 py-3 group tour-nav-settings ${currentView === 'settings' ? 'bg-blue-600/10 border-r-4 border-blue-500 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
         >
           <Settings className="w-5 h-5 mr-3" />
           <span className="text-sm font-medium">{t('nav.settings')}</span>

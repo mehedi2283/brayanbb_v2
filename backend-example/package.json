@@ -1,0 +1,17 @@
+{
+  "name": "ghl-dashboard-server",
+  "version": "1.0.0",
+  "description": "Node.js backend for GHL Dashboard",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.1",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.3.0"
+  }
+}

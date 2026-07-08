@@ -25,14 +25,14 @@ export function Header({ isClientMode, dateRange, setDateRange, user, onLogout }
       <div className="flex items-center space-x-4">
         <button
           onClick={toggleLanguage}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors text-sm font-medium"
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors text-sm font-medium tour-language-toggle"
           title="Toggle Language"
         >
           <Globe className="w-4 h-4 text-slate-400" />
           <span>{language === 'en' ? 'EN' : 'ES'}</span>
         </button>
 
-        <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 transition-colors group relative w-[250px] shrink-0">
+        <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 transition-colors group relative w-[250px] shrink-0 tour-date-picker">
           <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
           <div className="flex-1 min-w-0">
             <DatePicker

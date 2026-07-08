@@ -6,17 +6,19 @@ import { ChartRow } from './components/ChartRow';
 import { CallsTable } from './components/CallsTable';
 import { SummaryModal } from './components/SummaryModal';
 import { SettingsView } from './components/SettingsView';
+import { Tutorial } from './components/Tutorial';
 import { SubAccountsView } from './components/SubAccountsView';
 import { UsersView } from './components/UsersView';
 import { LoginView } from './components/LoginView';
 import { ConfigureTokenModal } from './components/ConfigureTokenModal';
 import { useLanguage } from './contexts/LanguageContext';
-import { fetchLocations, fetchCallLogs, API_BASE_URL, fetchAgents, Agent, authHeaders } from './api';
+import { fetchLocations, fetchCallLogs, API_BASE_URL, fetchAgents, Agent, authHeaders, saveTutorialComplete } from './api';
 import { CallLog, Location } from './types';
 import { Lock, ChevronDown, UserCheck } from 'lucide-react';
 
 export default function App() {
   const { t } = useLanguage();
+  const [runTutorial, setRunTutorial] = useState(false);
   const [user, setUser] = useState<any>(() => {
     const saved = sessionStorage.getItem('ghl_user');
     return saved ? JSON.parse(saved) : null;
@@ -42,7 +44,7 @@ export default function App() {
   const [tokens, setTokens] = useState<Record<string, string>>({});
   const [loadingTokens, setLoadingTokens] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
     if (!user) {
       setTokens({});
       return;
@@ -172,13 +174,30 @@ export default function App() {
   if (!user) {
     return <LoginView onLoginSuccess={(userData) => {
       setUser(userData);
-      if (userData.role === 'client') {
-        setCurrentView('call-logs');
-      } else {
-        setCurrentView('sub-accounts');
-      }
+      setCurrentView('call-logs');
     }} />;
   }
+
+
+  useEffect(() => {
+    if (user) {
+      // Use user.tutorialCompleted if it exists from the backend, 
+      // otherwise fallback to local storage for backward compatibility during transition.
+      const localCompleted = localStorage.getItem('tutorialCompleted_' + user.email);
+      if (!user.tutorialCompleted && !localCompleted) {
+        setRunTutorial(true);
+      }
+    }
+  }, [user]);
+
+  const handleTutorialFinish = () => {
+    if (user) {
+      localStorage.setItem('tutorialCompleted_' + user.email, 'true');
+      setUser({ ...user, tutorialCompleted: true });
+      saveTutorialComplete(user.email);
+    }
+    setRunTutorial(false);
+  };
 
   return (
     <div className="flex h-screen w-full bg-[#F8FAFC] font-sans overflow-hidden text-slate-800">
@@ -205,7 +224,7 @@ export default function App() {
         
         <div className="p-5 space-y-5 overflow-auto flex-1 relative">
           {currentView === 'settings' ? (
-            <SettingsView user={user} />
+            <SettingsView user={user} onRestartTutorial={() => setRunTutorial(true)} />
           ) : currentView === 'sub-accounts' ? (
             <SubAccountsView 
               locations={locations} 
@@ -308,6 +327,8 @@ export default function App() {
       </main>
 
       <SummaryModal call={selectedCall} onClose={() => setSelectedCall(null)} />
+      {user && <Tutorial run={runTutorial} onFinish={handleTutorialFinish} isClientMode={isClientMode} />}
+
       
       {isConfigureModalOpen && selectedLocationId && locations.find(l => l.id === selectedLocationId) && (
         <ConfigureTokenModal 
