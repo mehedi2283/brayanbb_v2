@@ -84,7 +84,7 @@ export function SettingsView({ user, onRestartTutorial }: SettingsViewProps) {
             <p className="text-sm text-slate-500 mt-1">{t("settings.agencySettingsDesc")}</p>
           </div>
           <div className="p-6 space-y-6">
-            <div>
+            <div className="tour-settings-api-key">
               <label className="block text-sm font-medium text-slate-700 mb-2">{t("settings.newAgencyKey")}</label>
               <input
                 type="password"
@@ -122,7 +122,7 @@ export function SettingsView({ user, onRestartTutorial }: SettingsViewProps) {
           <p className="text-sm text-slate-500 mt-1">{t("settings.securityDesc")}</p>
         </div>
         <div className="p-6">
-          <form onSubmit={handleUpdatePassword} className="space-y-6">
+          <form onSubmit={handleUpdatePassword} className="space-y-6 tour-settings-password">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">{t("settings.oldPassword")}</label>
               <input

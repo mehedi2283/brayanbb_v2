@@ -266,7 +266,7 @@ useEffect(() => {
                 <>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="relative">
+                      <div className="relative tour-agent-select">
                         <button 
                           onClick={() => setIsAgentDropdownOpen(!isAgentDropdownOpen)}
                           onBlur={() => setTimeout(() => setIsAgentDropdownOpen(false), 200)}
@@ -327,7 +327,43 @@ useEffect(() => {
       </main>
 
       <SummaryModal call={selectedCall} onClose={() => setSelectedCall(null)} />
-      {user && <Tutorial run={runTutorial} onFinish={handleTutorialFinish} isClientMode={isClientMode} />}
+      {user && (
+        <Tutorial 
+          run={runTutorial} 
+          onFinish={handleTutorialFinish} 
+          isClientMode={isClientMode} 
+          currentView={currentView} 
+          onViewChange={setCurrentView}
+          onOpenSampleSummary={() => {
+            if (calls.length > 0) {
+              setSelectedCall(calls[0]);
+            } else {
+              setSelectedCall({
+                id: 'dummy',
+                locationId: 'dummy_location',
+                contactId: '+1234567890',
+                contactName: 'Demo Contact',
+                fromNumber: '+0987654321',
+                duration: 120,
+                createdAt: new Date().toISOString(),
+                agentId: 'agent_dummy',
+                agentName: 'Demo Agent',
+                summary: 'This is a sample summary for the tutorial.',
+                transcript: [
+                   { role: 'bot', text: 'Hello, how can I help you today?', timestamp: '00:00' },
+                   { role: 'human', text: 'Hi, I need help with my account.', timestamp: '00:05' }
+                ],
+                extractedData: { intent: 'account_help' },
+                status: 'Human Answered',
+                trialCall: false,
+                workflowName: 'Inbound Support',
+                actionsTriggered: 0
+              });
+            }
+          }}
+          onCloseSummary={() => setSelectedCall(null)}
+        />
+      )}
 
       
       {isConfigureModalOpen && selectedLocationId && locations.find(l => l.id === selectedLocationId) && (

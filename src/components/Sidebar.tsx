@@ -51,7 +51,7 @@ export function Sidebar({ currentView, onViewChange, locations, selectedLocation
           <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
         </button>
         {isDropdownOpen && !isClientMode && (
-          <div className="absolute top-full left-6 right-6 mt-1 bg-[#1E293B] border border-slate-700 rounded-md shadow-xl z-20 max-h-60 overflow-y-auto py-1">
+          <div className="absolute top-full left-6 right-6 mt-1 bg-[#1E293B] border border-slate-700 rounded-md shadow-xl z-50 max-h-60 overflow-y-auto py-1">
             {locations.length > 0 ? locations.map((loc) => (
               <button
                 key={loc.id}

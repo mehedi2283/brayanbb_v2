@@ -50,7 +50,7 @@ export function ConfigureTokenModal({ location, onClose, onSuccess }: ConfigureT
       <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-slate-800">{t("modal.configureToken")}</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1 rounded-md hover:bg-slate-100">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1 rounded-md hover:bg-slate-100 tour-configure-token-close">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -60,7 +60,7 @@ export function ConfigureTokenModal({ location, onClose, onSuccess }: ConfigureT
         <input
           type="password"
           placeholder={t("modal.pasteToken")}
-          className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm mb-4"
+          className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm mb-4 tour-configure-token-input"
           value={editTokenValue}
           onChange={e => setEditTokenValue(e.target.value)}
         />
@@ -106,7 +106,7 @@ export function ConfigureTokenModal({ location, onClose, onSuccess }: ConfigureT
           <button 
             onClick={handleSaveToken}
             disabled={isSaving || !editTokenValue}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 tour-save-token"
           >
             {isSaving ? t('modal.saving') : t('modal.saveToken')}
           </button>

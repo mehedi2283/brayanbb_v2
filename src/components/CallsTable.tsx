@@ -48,7 +48,7 @@ export function CallsTable({ calls, agents, onOpenSummary }: CallsTableProps) {
             {t("metrics.attempted")}
           </button>
         </div>
-        <div className="flex items-center space-x-2 py-2">
+        <div className="flex items-center space-x-2 py-2 tour-search-field">
           <input 
             type="text" 
             placeholder={t("callsTable.search")} 
@@ -87,15 +87,15 @@ export function CallsTable({ calls, agents, onOpenSummary }: CallsTableProps) {
                 <td className="px-4 py-2.5 text-right space-x-1.5 flex items-center justify-end">
                   <button 
                     onClick={() => onOpenSummary(call)}
-                    className="px-2 py-1 bg-blue-50 text-blue-600 rounded border border-blue-100 hover:bg-blue-100 transition-colors"
+                    className="px-2 py-1 bg-blue-50 text-blue-600 rounded border border-blue-100 hover:bg-blue-100 transition-colors tour-summary-button"
                   >
-                    Summary
+                    {t("callsTable.summary")}
                   </button>
                 </td>
               </tr>
             ))}
             {filteredCalls.length === 0 && (
-              <tr>
+              <tr className="tour-summary-button">
                 <td colSpan={7} className="px-4 py-8 text-center text-slate-500">{t("callsTable.noCalls")}</td>
               </tr>
             )}

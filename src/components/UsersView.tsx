@@ -38,7 +38,7 @@ function CustomSelect({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full text-sm border rounded-lg py-2.5 px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between transition-colors ${
+        className={`w-full text-sm border rounded-lg h-[38px] px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between transition-colors ${
           disabled ? 'bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed' : 'border-slate-300 text-slate-700 hover:bg-slate-50'
         } ${isOpen ? 'ring-2 ring-blue-500 border-blue-500' : ''}`}
       >
@@ -159,15 +159,15 @@ export function UsersView({ locations }: { locations: Location[] }) {
 
         <div className="p-6 border-b border-slate-100 bg-slate-50/50">
           <form onSubmit={handleCreateUser} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 tour-user-email">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("auth.email")}</label>
-              <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full text-sm border border-slate-300 rounded-lg py-2 px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="user@example.com" />
+              <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full text-sm border border-slate-300 rounded-lg h-[38px] px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="user@example.com" />
             </div>
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 tour-user-password">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("auth.password")}</label>
-              <input required type="text" value={password} onChange={e => setPassword(e.target.value)} className="w-full text-sm border border-slate-300 rounded-lg py-2 px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder={t("auth.password")} />
+              <input required type="text" value={password} onChange={e => setPassword(e.target.value)} className="w-full text-sm border border-slate-300 rounded-lg h-[38px] px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder={t("auth.password")} />
             </div>
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 tour-user-role">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("settings.role")}</label>
               <CustomSelect
                 value={role}
@@ -178,7 +178,7 @@ export function UsersView({ locations }: { locations: Location[] }) {
                 ]}
               />
             </div>
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 tour-user-location">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("users.assignedLocation")}</label>
               <CustomSelect
                 disabled={role === 'admin'}
@@ -188,8 +188,8 @@ export function UsersView({ locations }: { locations: Location[] }) {
                 options={locations.map(loc => ({ label: loc.name, value: loc.id }))}
               />
             </div>
-            <div className="lg:col-span-1 flex items-end">
-              <button type="submit" className="w-full bg-blue-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors flex items-center justify-center">
+            <div className="lg:col-span-1 flex items-end tour-add-user-btn">
+              <button type="submit" className="w-full h-[38px] bg-blue-600 text-white text-sm font-medium px-4 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors flex items-center justify-center">
                 <UserPlus className="w-4 h-4 mr-2" />
                 {t("users.addUser")}
               </button>

@@ -34,7 +34,7 @@ export function SummaryModal({ call, onClose }: SummaryModalProps) {
         <div className="flex border-b border-slate-200 px-4 mt-2">
           <button 
             onClick={() => setActiveTab('summary')}
-            className={cn("px-4 py-2 text-sm font-medium border-b-2 transition-colors", 
+            className={cn("px-4 py-2 text-sm font-medium border-b-2 transition-colors tour-modal-summary-tab", 
               activeTab === 'summary' ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-700"
             )}
           >
@@ -42,7 +42,7 @@ export function SummaryModal({ call, onClose }: SummaryModalProps) {
           </button>
           <button 
             onClick={() => setActiveTab('transcript')}
-            className={cn("px-4 py-2 text-sm font-medium border-b-2 transition-colors", 
+            className={cn("px-4 py-2 text-sm font-medium border-b-2 transition-colors tour-modal-transcript-tab", 
               activeTab === 'transcript' ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-700"
             )}
           >
@@ -60,7 +60,7 @@ export function SummaryModal({ call, onClose }: SummaryModalProps) {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 tour-modal-metadata">
                 <h3 className="text-xs font-bold text-slate-400 uppercase">{t("summaryModal.metadata")}</h3>
                 <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs">
                   <div><span className="text-slate-500 block mb-1">{t("summaryModal.agentId")}</span><span className="font-medium text-slate-800">{call.agentId}</span></div>

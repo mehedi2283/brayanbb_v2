@@ -77,7 +77,7 @@ export function SubAccountsView({
                       onClick={() => {
                         setEditingLoc(loc);
                       }}
-                      className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                      className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors tour-add-token"
                     >
                       <Edit2 className="w-3 h-3 mr-1" /> {hasToken ? t('subaccounts.update') : t('subaccounts.addToken')}
                     </button>
