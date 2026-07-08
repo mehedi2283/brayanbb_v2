@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, Lock, Mail, Loader2 } from 'lucide-react';
+import { Building2, Lock, Mail, Loader2, Globe } from 'lucide-react';
 import { login } from '../api';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -8,7 +8,12 @@ interface LoginViewProps {
 }
 
 export function LoginView({ onLoginSuccess }: LoginViewProps) {
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
+  
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'es' : 'en');
+  };
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,7 +35,17 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative">
+      <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
+        <button
+          onClick={toggleLanguage}
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors text-sm font-medium shadow-sm"
+          title="Toggle Language"
+        >
+          <Globe className="w-4 h-4 text-slate-400" />
+          <span>{language === 'en' ? 'EN' : 'ES'}</span>
+        </button>
+      </div>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-md">
@@ -62,7 +77,7 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 bg-white border border-slate-300 rounded-md py-2 text-sm shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="admin@example.com"
+                  placeholder="user@example.com"
                 />
               </div>
             </div>

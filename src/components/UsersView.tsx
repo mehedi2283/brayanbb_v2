@@ -161,7 +161,7 @@ export function UsersView({ locations }: { locations: Location[] }) {
           <form onSubmit={handleCreateUser} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
             <div className="lg:col-span-1">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("auth.email")}</label>
-              <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full text-sm border border-slate-300 rounded-lg py-2 px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="client@domain.com" />
+              <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full text-sm border border-slate-300 rounded-lg py-2 px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="user@example.com" />
             </div>
             <div className="lg:col-span-1">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("auth.password")}</label>
