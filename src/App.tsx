@@ -50,7 +50,7 @@ useEffect(() => {
       return;
     }
     
-    if (user.role === 'admin') {
+    if (user?.role === 'admin') {
       setLoadingTokens(true);
       fetch(`${API_BASE_URL}/api/tokens`, { headers: authHeaders() })
         .then(res => res.json())
@@ -85,7 +85,7 @@ useEffect(() => {
       
       if (locs.length > 0) {
         if (!selectedLocationId || !locs.find(l => l.id === selectedLocationId)) {
-          if (user.role !== 'client') {
+          if (user?.role !== 'client') {
             setSelectedLocationId(locs[0].id);
           } else {
             // For clients, if they have a single location assigned, lock to it
@@ -103,7 +103,7 @@ useEffect(() => {
   useEffect(() => {
     if (user && selectedLocationId && currentView === 'call-logs') {
       // If we have an admin user, check if tokens have been loaded and if the selected location is configured.
-      if (user.role === 'admin' && Object.keys(tokens).length > 0 && tokens[selectedLocationId] !== 'configured') {
+      if (user?.role === 'admin' && Object.keys(tokens).length > 0 && tokens[selectedLocationId] !== 'configured') {
         setCalls([]);
         setAgents([]);
         setIsPreviewMode(false);
@@ -171,20 +171,14 @@ useEffect(() => {
     };
   }, [filteredCalls]);
 
-  if (!user) {
-    return <LoginView onLoginSuccess={(userData) => {
-      setUser(userData);
-      setCurrentView('call-logs');
-    }} />;
-  }
 
 
   useEffect(() => {
     if (user) {
       // Use user.tutorialCompleted if it exists from the backend, 
       // otherwise fallback to local storage for backward compatibility during transition.
-      const localCompleted = localStorage.getItem('tutorialCompleted_' + user.email);
-      if (!user.tutorialCompleted && !localCompleted) {
+      const localCompleted = localStorage.getItem('tutorialCompleted_' + user?.email);
+      if (!user?.tutorialCompleted && !localCompleted) {
         setRunTutorial(true);
       }
     }
@@ -192,12 +186,19 @@ useEffect(() => {
 
   const handleTutorialFinish = () => {
     if (user) {
-      localStorage.setItem('tutorialCompleted_' + user.email, 'true');
-      setUser({ ...user, tutorialCompleted: true });
-      saveTutorialComplete(user.email);
+      localStorage.setItem('tutorialCompleted_' + user?.email, 'true');
+      setUser({ ...user, tutorialCompleted: true } as any);
+      saveTutorialComplete(user?.email || '');
     }
     setRunTutorial(false);
   };
+
+  if (!user) {
+    return <LoginView onLoginSuccess={(userData) => {
+      setUser(userData);
+      setCurrentView('call-logs');
+    }} />;
+  }
 
   return (
     <div className="flex h-screen w-full bg-[#F8FAFC] font-sans overflow-hidden text-slate-800">

@@ -1,0 +1,19 @@
+
+  if (!user) {
+    return <LoginView onLoginSuccess={(userData) => {
+      setUser(userData);
+      setCurrentView('call-logs');
+    }} />;
+  }
+
+
+  useEffect(() => {
+    if (user) {
+      // Use user.tutorialCompleted if it exists from the backend, 
+      // otherwise fallback to local storage for backward compatibility during transition.
+      const localCompleted = localStorage.getItem('tutorialCompleted_' + user.email);
+      if (!user.tutorialCompleted && !localCompleted) {
+        setRunTutorial(true);
+      }
+    }
+  }, [user]);

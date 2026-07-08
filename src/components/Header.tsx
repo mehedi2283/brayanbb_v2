@@ -65,8 +65,8 @@ export function Header({ isClientMode, dateRange, setDateRange, user, onLogout }
                 <User className="w-4 h-4 text-blue-600" />
               </div>
               <div className="text-sm">
-                <p className="font-medium text-slate-700 leading-tight">{user.email}</p>
-                <p className="text-[10px] text-slate-500 uppercase font-semibold">{user.role === "client" ? t("users.client") : t("users.admin")}</p>
+                <p className="font-medium text-slate-700 leading-tight">{user?.email}</p>
+                <p className="text-[10px] text-slate-500 uppercase font-semibold">{user?.role === "client" ? t("users.client") : t("users.admin")}</p>
               </div>
             </div>
             <button
