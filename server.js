@@ -54,7 +54,8 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['admin', 'client'], default: 'client' },
-  locationId: { type: String } // Only required for clients
+  locationId: { type: String }, // Only required for clients
+  tutorialCompleted: { type: Boolean, default: false }
 });
 
 const User = mongoose.model('User', UserSchema);
@@ -148,13 +149,29 @@ app.post('/api/auth/login', async (req, res) => {
 
     res.json({
       token,
-      user: { email: user.email, role: user.role, locationId: user.locationId }
+      user: { email: user.email, role: user.role, locationId: user.locationId, tutorialCompleted: user.tutorialCompleted }
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
+app.post('/api/users/tutorial', authenticateToken, async (req, res) => {
+  try {
+    // Only allow users to update their own tutorial status unless admin
+    if (req.user.role !== 'admin' && req.user.email !== req.body.email) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    
+    await User.findOneAndUpdate(
+      { email: req.body.email },
+      { tutorialCompleted: true }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 app.get('/api/users', requireAdmin, async (req, res) => {
   try {
     const users = await User.find({}, '-password'); // Exclude passwords
@@ -173,7 +190,7 @@ app.post('/api/users', requireAdmin, async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ email, password: hashedPassword, role: role || 'client', locationId });
     await user.save();
-    res.json({ success: true, message: 'User created successfully', user: { email: user.email, role: user.role, locationId: user.locationId } });
+    res.json({ success: true, message: 'User created successfully', user: { email: user.email, role: user.role, locationId: user.locationId, tutorialCompleted: user.tutorialCompleted } });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

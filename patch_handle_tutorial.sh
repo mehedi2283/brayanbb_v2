@@ -1,0 +1,1 @@
+sed -i 's/setUser({ ...user, tutorialCompleted: true } as any);/setUser({ ...user, tutorialCompleted: true } as any);\n      sessionStorage.setItem('\''ghl_user'\'', JSON.stringify({ ...user, tutorialCompleted: true }));/' src/App.tsx

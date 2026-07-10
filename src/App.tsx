@@ -192,6 +192,7 @@ useEffect(() => {
     if (user) {
       localStorage.setItem('tutorialCompleted_' + user?.email, 'true');
       setUser({ ...user, tutorialCompleted: true } as any);
+      sessionStorage.setItem('ghl_user', JSON.stringify({ ...user, tutorialCompleted: true }));
       saveTutorialComplete(user?.email || '');
     }
     setRunTutorial(false);
