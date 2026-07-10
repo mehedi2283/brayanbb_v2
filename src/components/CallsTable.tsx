@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CallLog } from '../types';
 import { Agent } from '../api';
 import { format } from 'date-fns';
-import { Filter, ChevronDown, ChevronUp, AlignLeft, FileText, Info, Play, Search, Clock, FileText as TranscriptIcon } from 'lucide-react';
+import { ChevronDown, ChevronUp, AlignLeft, FileText, Info, Play, Search, Clock, FileText as TranscriptIcon } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -44,16 +44,12 @@ export function CallsTable({ onOpenSummary, calls, agents }: CallsTableProps) {
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
               type="text" 
-              placeholder={t("callsTable.searchPlaceholder")}
+              placeholder={t("callsTable.search")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 pr-4 py-2 w-full border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-slate-100 focus:border-slate-400 bg-slate-50 transition-all font-medium placeholder:font-normal"
             />
           </div>
-          <button className="flex items-center px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-colors font-semibold shadow-sm bg-white">
-            <Filter className="w-4 h-4 mr-2 text-slate-400" />
-            {t("callsTable.filter")}
-          </button>
         </div>
       </div>
 
