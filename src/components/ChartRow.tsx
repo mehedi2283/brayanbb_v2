@@ -11,13 +11,14 @@ interface ChartRowProps {
 const COLORS = {
   'Human Answered': '#10B981', // emerald-500
   'Voicemail': '#FBBF24',      // amber-400
-  'No Answer': '#F97316',      // orange-500
-  'Failed': '#EF4444',         // rose-500
+  'No Answer': '#94A3B8',      // slate-400
+  'Failed': '#F43F5E',         // rose-500
 };
 
 export function ChartRow({ humanAnswered, voicemail, noAnswer, failed }: ChartRowProps) {
   const { t } = useLanguage();
   const total = humanAnswered + voicemail + noAnswer + failed;
+
   const data = [
     { name: t('chart.humanAnswered'), value: humanAnswered, color: COLORS['Human Answered'] },
     { name: t('chart.voicemail'), value: voicemail, color: COLORS['Voicemail'] },
@@ -26,47 +27,54 @@ export function ChartRow({ humanAnswered, voicemail, noAnswer, failed }: ChartRo
   ];
 
   return (
-    <div className="grid grid-cols-12 gap-5 h-[200px]">
-      <div className="col-span-5 bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-8">
-        <div className="relative w-32 h-32 shrink-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                innerRadius={30}
-                outerRadius={45}
-                stroke="none"
-                dataKey="value"
-              >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-xl font-bold leading-none">{total}</span>
-            <span className="text-[9px] text-slate-400 font-bold uppercase">Total</span>
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[220px]">
+      <div className="col-span-1 md:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center relative">
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest absolute top-6 left-6">{t("chart.callOutcomes")}</h3>
+        <div className="flex items-center space-x-6 mt-4">
+          <div className="relative w-28 h-28 shrink-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={35}
+                  outerRadius={50}
+                  stroke="none"
+                  dataKey="value"
+                  paddingAngle={2}
+                  cornerRadius={4}
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-2xl font-black text-slate-900 leading-none">{total}</span>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {data.map((item) => (
+              <div key={item.name} className="flex items-center text-sm space-x-2.5 font-medium text-slate-700">
+                <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: item.color }}></div>
+                <span>{item.name}: <span className="font-bold text-slate-900 ml-1">{item.value}</span></span>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="space-y-1">
-          <div className="text-xs font-bold mb-2">{t("chart.callOutcomes")}</div>
-          {data.map((item) => (
-            <div key={item.name} className="flex items-center text-xs space-x-2 font-medium text-slate-600">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
-              <span>{item.name}: {item.value}</span>
-            </div>
-          ))}
-        </div>
       </div>
-      <div className="col-span-7 grid grid-cols-2 gap-4 h-full">
+      
+      <div className="col-span-1 md:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-6 h-full">
         {data.map((item) => (
-          <div key={item.name} className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col justify-between">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">{item.name}</span>
-            <div className="text-xl font-bold">
-              {item.value} <span className="text-xs font-normal ml-2" style={{ color: item.color }}>{total > 0 ? Math.round((item.value / total) * 100) : 0}%</span>
+          <div key={item.name} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{item.name}</span>
+            <div className="mt-4 flex items-end justify-between">
+              <span className="text-3xl font-black text-slate-900 tracking-tight">{item.value}</span>
+              <span className="text-sm font-bold bg-slate-50 px-2 py-1 rounded-lg" style={{ color: item.color }}>
+                {total > 0 ? Math.round((item.value / total) * 100) : 0}%
+              </span>
             </div>
           </div>
         ))}

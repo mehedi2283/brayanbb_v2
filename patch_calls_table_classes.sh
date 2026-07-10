@@ -1,0 +1,3 @@
+sed -i 's/<h3 className="flex items-center text-sm font-semibold text-slate-900 mb-3">/<h3 className="flex items-center text-sm font-semibold text-slate-900 mb-3 tour-modal-summary-tab">/' src/components/CallsTable.tsx
+sed -i 's/<h3 className="flex items-center text-sm font-semibold text-slate-900 mb-4">/<h3 className="flex items-center text-sm font-semibold text-slate-900 mb-4 tour-modal-metadata">/' src/components/CallsTable.tsx
+sed -i 's/<h3 className="flex items-center text-sm font-semibold text-slate-900 mb-4 sticky top-0 bg-white pb-2 border-b border-slate-100">/<h3 className="flex items-center text-sm font-semibold text-slate-900 mb-4 sticky top-0 bg-white pb-2 border-b border-slate-100 tour-modal-transcript-tab">/' src/components/CallsTable.tsx

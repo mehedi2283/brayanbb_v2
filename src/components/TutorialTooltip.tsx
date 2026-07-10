@@ -45,12 +45,11 @@ export function TutorialTooltip({
             <div
               key={i}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === index ? 'w-5 bg-blue-600' : 'w-1.5 bg-slate-300'
+                i === index ? 'w-5 bg-slate-900' : 'w-1.5 bg-slate-300'
               }`}
             />
           ))}
         </div>
-
         <div className="flex items-center space-x-2">
           {index > 0 && (
             <button
@@ -64,7 +63,7 @@ export function TutorialTooltip({
           <button
             {...primaryProps}
             style={{}}
-            className="flex items-center text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+            className="flex items-center text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 px-4 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
           >
             {isLastStep ? (
               <>

@@ -60,7 +60,7 @@ export function ConfigureTokenModal({ location, onClose, onSuccess }: ConfigureT
         <input
           type="password"
           placeholder={t("modal.pasteToken")}
-          className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm mb-4 tour-configure-token-input"
+          className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 text-sm mb-4 tour-configure-token-input"
           value={editTokenValue}
           onChange={e => setEditTokenValue(e.target.value)}
         />
@@ -72,7 +72,7 @@ export function ConfigureTokenModal({ location, onClose, onSuccess }: ConfigureT
               <button
                 key={scope.value}
                 onClick={() => handleCopyScope(scope.value)}
-                className="inline-flex items-center text-xs text-slate-600 bg-white border border-slate-200 px-2.5 py-1.5 rounded-full hover:bg-slate-50 hover:border-blue-300 hover:text-blue-600 transition-colors"
+                className="inline-flex items-center text-xs text-slate-600 bg-white border border-slate-200 px-2.5 py-1.5 rounded-full hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 transition-colors"
                 title={`Copy ${scope.value}`}
               >
                 {scope.label} - <span className="font-mono ml-1 text-slate-500">{scope.value}</span>
@@ -106,7 +106,7 @@ export function ConfigureTokenModal({ location, onClose, onSuccess }: ConfigureT
           <button 
             onClick={handleSaveToken}
             disabled={isSaving || !editTokenValue}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 tour-save-token"
+            className="px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-md hover:bg-slate-800 disabled:opacity-50 tour-save-token"
           >
             {isSaving ? t('modal.saving') : t('modal.saveToken')}
           </button>

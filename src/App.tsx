@@ -7,6 +7,7 @@ import { CallsTable } from './components/CallsTable';
 import { SummaryModal } from './components/SummaryModal';
 import { SettingsView } from './components/SettingsView';
 import { Tutorial } from './components/Tutorial';
+import { WaveformLoader } from './components/WaveformLoader';
 import { SubAccountsView } from './components/SubAccountsView';
 import { UsersView } from './components/UsersView';
 import { LoginView } from './components/LoginView';
@@ -15,6 +16,7 @@ import { useLanguage } from './contexts/LanguageContext';
 import { fetchLocations, fetchCallLogs, API_BASE_URL, fetchAgents, Agent, authHeaders, saveTutorialComplete } from './api';
 import { CallLog, Location } from './types';
 import { Lock, ChevronDown, UserCheck } from 'lucide-react';
+import { cn } from './lib/utils';
 
 export default function App() {
   const { t } = useLanguage();
@@ -28,6 +30,7 @@ export default function App() {
   const [selectedLocationId, setSelectedLocationId] = useState<string>(() => localStorage.getItem('ghl_location_id') || '');
   const [calls, setCalls] = useState<CallLog[]>([]);
   const [selectedCall, setSelectedCall] = useState<CallLog | null>(null);
+  const [dummyCall, setDummyCall] = useState<CallLog | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [apiWarning, setApiWarning] = useState<string | null>(null);
@@ -228,7 +231,7 @@ useEffect(() => {
           }}
         />
         
-        <div className="p-5 space-y-5 overflow-auto flex-1 relative">
+        <div className="p-8 space-y-8 bg-slate-50 overflow-auto flex-1 relative">
           {apiWarning && (
             <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-md shadow-sm mb-4 flex items-start justify-between">
               <div className="flex items-start">
@@ -280,7 +283,7 @@ useEffect(() => {
                     {!isClientMode && (
                       <button 
                         onClick={() => setIsConfigureModalOpen(true)}
-                        className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                        className="px-5 py-2.5 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
                       >
                         Configure API Token
                       </button>
@@ -288,10 +291,7 @@ useEffect(() => {
                   </div>
                 </div>
               ) : loading ? (
-                 <div className="flex flex-col items-center justify-center h-[60vh] w-full">
-                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-slate-500 text-sm font-medium">{t("app.loadingCallLogs")}</p>
-                 </div>
+                 <WaveformLoader />
               ) : (
                 <>
                   <div className="flex items-center justify-between">
@@ -300,17 +300,25 @@ useEffect(() => {
                         <button 
                           onClick={() => setIsAgentDropdownOpen(!isAgentDropdownOpen)}
                           onBlur={() => setTimeout(() => setIsAgentDropdownOpen(false), 200)}
-                          className="bg-white border border-slate-200 text-sm rounded-md px-3 py-1.5 font-medium outline-none focus:border-blue-500 flex items-center justify-between min-w-[140px]"
+                          className={cn(
+                            "bg-white border text-sm rounded-xl px-4 py-2.5 font-bold outline-none flex items-center justify-between min-w-[180px] shadow-sm transition-all",
+                            isAgentDropdownOpen 
+                              ? "border-slate-400 ring-4 ring-slate-100 text-slate-900" 
+                              : "border-slate-200 text-slate-700 hover:border-slate-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-50"
+                          )}
                         >
                           <span className="truncate">
                             {selectedAgentId === 'all' ? t('app.allAgents') : agents.find(a => a.id === selectedAgentId)?.name || t('app.unknownAgent')}
                           </span>
-                          <ChevronDown className="w-4 h-4 text-slate-500 ml-2" />
+                          <ChevronDown className={cn("w-4 h-4 ml-2 transition-transform", isAgentDropdownOpen ? "text-slate-900 rotate-180" : "text-slate-400")} />
                         </button>
                         {isAgentDropdownOpen && (
-                          <div className="absolute top-full left-0 mt-1 w-full bg-white border border-slate-200 rounded-md shadow-lg z-10 py-1">
+                          <div className="absolute top-full left-0 mt-2 w-full bg-white border border-slate-100 rounded-xl shadow-xl shadow-slate-200/50 z-50 py-1.5 overflow-hidden">
                             <button
-                              className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors ${selectedAgentId === 'all' ? 'bg-blue-600 text-white hover:bg-blue-600 hover:text-white' : 'text-slate-700'}`}
+                              className={cn(
+                                "w-full text-left px-4 py-2.5 text-sm font-semibold transition-colors",
+                                selectedAgentId === 'all' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                              )}
                               onClick={() => { setSelectedAgentId('all'); setIsAgentDropdownOpen(false); }}
                             >
                               All Agents
@@ -318,7 +326,10 @@ useEffect(() => {
                             {agents.map(agent => (
                               <button
                                 key={agent.id}
-                                className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors ${selectedAgentId === agent.id ? 'bg-blue-600 text-white hover:bg-blue-600 hover:text-white' : 'text-slate-700'}`}
+                                className={cn(
+                                  "w-full text-left px-4 py-2.5 text-sm font-semibold transition-colors",
+                                  selectedAgentId === agent.id ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                )}
                                 onClick={() => { setSelectedAgentId(agent.id); setIsAgentDropdownOpen(false); }}
                               >
                                 {agent.name}
@@ -345,9 +356,9 @@ useEffect(() => {
                   />
 
                   <CallsTable 
-                    calls={filteredCalls} 
+                    calls={dummyCall ? [dummyCall, ...filteredCalls] : filteredCalls} 
                     agents={agents}
-                    onOpenSummary={setSelectedCall} 
+                    onOpenSummary={(call) => setSelectedCall(call)} 
                   />
                 </>
               )}
@@ -356,7 +367,7 @@ useEffect(() => {
         </div>
       </main>
 
-      <SummaryModal call={selectedCall} onClose={() => setSelectedCall(null)} />
+      
       {user && (
         <Tutorial 
           run={runTutorial} 
@@ -368,34 +379,43 @@ useEffect(() => {
             if (calls.length > 0) {
               setSelectedCall(calls[0]);
             } else {
-              setSelectedCall({
+              const dummy = {
                 id: 'dummy',
                 locationId: 'dummy_location',
                 contactId: '+1234567890',
                 contactName: 'Demo Contact',
                 fromNumber: '+0987654321',
-                duration: 120,
-                createdAt: new Date().toISOString(),
-                agentId: 'agent_dummy',
-                agentName: 'Demo Agent',
-                summary: 'This is a sample summary for the tutorial.',
-                transcript: [
-                   { role: 'bot', text: 'Hello, how can I help you today?', timestamp: '00:00' },
-                   { role: 'human', text: 'Hi, I need help with my account.', timestamp: '00:05' }
-                ],
-                extractedData: { intent: 'account_help' },
+                toNumber: '+1987654321',
                 status: 'Human Answered',
+                duration: 185,
+                createdAt: new Date().toISOString(),
+                summary: 'This is a sample AI-generated summary of the call. The customer was asking about pricing and features.',
+                transcript: [
+                  { role: 'user', text: 'Hello, I want to know about your product.', timestamp: '00:00' },
+                  { role: 'bot', text: 'Hi! I would be happy to help. Our product costs $99/mo.', timestamp: '00:05' }
+                ],
+                recordingUrl: '',
+                extractedData: { intent: 'Pricing Inquiry', sentiment: 'Positive' },
+                agentId: 'agent_1',
                 trialCall: false,
+                callDirection: 'inbound',
                 workflowName: 'Inbound Support',
                 actionsTriggered: 0
-              });
+              };
+              setDummyCall(dummy as any);
+              setSelectedCall(dummy as any);
             }
           }}
-          onCloseSummary={() => setSelectedCall(null)}
+          onCloseSummary={() => {
+            setSelectedCall(null);
+            setDummyCall(null);
+          }}
         />
       )}
 
       
+      <SummaryModal call={selectedCall} onClose={() => setSelectedCall(null)} />
+
       {isConfigureModalOpen && selectedLocationId && locations.find(l => l.id === selectedLocationId) && (
         <ConfigureTokenModal 
           location={locations.find(l => l.id === selectedLocationId)!}

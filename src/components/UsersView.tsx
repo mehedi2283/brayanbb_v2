@@ -38,12 +38,12 @@ function CustomSelect({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full text-sm border rounded-lg h-[38px] px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between transition-colors ${
+        className={`w-full text-sm border rounded-lg h-[38px] px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 flex items-center justify-between transition-colors ${
           disabled ? 'bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed' : 'border-slate-300 text-slate-700 hover:bg-slate-50'
-        } ${isOpen ? 'ring-2 ring-blue-500 border-blue-500' : ''}`}
+        } ${isOpen ? 'ring-2 ring-slate-400 border-slate-400' : ''}`}
       >
         <span className="truncate">{selectedOption ? selectedOption.label : placeholder}</span>
-        <ChevronDown className={`w-4 h-4 ml-2 transition-transform duration-200 ${isOpen ? 'rotate-180 text-blue-500' : 'text-slate-400'}`} />
+        <ChevronDown className={`w-4 h-4 ml-2 transition-transform duration-200 ${isOpen ? 'rotate-180 text-slate-400' : 'text-slate-400'}`} />
       </button>
 
       {isOpen && !disabled && (
@@ -52,8 +52,8 @@ function CustomSelect({
             <button
               key={option.value}
               type="button"
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 hover:text-blue-700 transition-colors ${
-                value === option.value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-slate-700'
+              className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-100 hover:text-slate-800 transition-colors ${
+                value === option.value ? 'bg-slate-100 text-slate-800 font-medium' : 'text-slate-700'
               }`}
               onClick={() => {
                 onChange(option.value);
@@ -161,11 +161,11 @@ export function UsersView({ locations }: { locations: Location[] }) {
           <form onSubmit={handleCreateUser} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
             <div className="lg:col-span-1 tour-user-email">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("auth.email")}</label>
-              <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full text-sm border border-slate-300 rounded-lg h-[38px] px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="user@example.com" />
+              <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full text-sm border border-slate-300 rounded-lg h-[38px] px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400" placeholder="user@example.com" />
             </div>
             <div className="lg:col-span-1 tour-user-password">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("auth.password")}</label>
-              <input required type="text" value={password} onChange={e => setPassword(e.target.value)} className="w-full text-sm border border-slate-300 rounded-lg h-[38px] px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder={t("auth.password")} />
+              <input required type="text" value={password} onChange={e => setPassword(e.target.value)} className="w-full text-sm border border-slate-300 rounded-lg h-[38px] px-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400" placeholder={t("auth.password")} />
             </div>
             <div className="lg:col-span-1 tour-user-role">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("settings.role")}</label>
@@ -189,7 +189,7 @@ export function UsersView({ locations }: { locations: Location[] }) {
               />
             </div>
             <div className="lg:col-span-1 flex items-end tour-add-user-btn">
-              <button type="submit" className="w-full h-[38px] bg-blue-600 text-white text-sm font-medium px-4 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors flex items-center justify-center">
+              <button type="submit" className="w-full h-[38px] bg-slate-900 text-white text-sm font-medium px-4 rounded-lg shadow-sm hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1 transition-colors flex items-center justify-center">
                 <UserPlus className="w-4 h-4 mr-2" />
                 {t("users.addUser")}
               </button>
@@ -214,7 +214,7 @@ export function UsersView({ locations }: { locations: Location[] }) {
                 <tr key={u.email} className="hover:bg-slate-50/50">
                   <td className="px-6 py-4 font-medium text-slate-900">{u.email}</td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-slate-200 text-slate-800'}`}>
                       {u.role === 'admin' ? <ShieldAlert className="w-3 h-3 mr-1" /> : <UserPlus className="w-3 h-3 mr-1" />}
                       {u.role}
                     </span>

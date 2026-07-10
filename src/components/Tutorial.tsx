@@ -40,7 +40,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
         title: t('tutorial.agentSelectTitle') || 'Agent Selection',
         content: t('tutorial.agentSelect') || 'Filter calls by a specific agent or view all agents at once.',
         placement: 'bottom',
-        spotlightPadding: 4,
         data: { view: 'call-logs' }
       },
       {
@@ -48,7 +47,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
         title: t('tutorial.searchFieldTitle') || 'Search Calls',
         content: t('tutorial.searchField') || 'Quickly find specific calls by searching for contact names or numbers.',
         placement: 'bottom',
-        spotlightPadding: 4,
         data: { view: 'call-logs' }
       },
       {
@@ -63,21 +61,18 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
         title: 'Summary Tab',
         content: 'View AI-generated summaries and metadata of your calls here.',
         placement: 'bottom',
-        spotlightPadding: 4,        data: { view: 'call-logs' }
       },
       {
         target: '.tour-modal-metadata',
         title: 'Call Metadata',
         content: 'Here you can see the duration, agent, and other important metadata for this call.',
         placement: 'bottom',
-        spotlightPadding: 4,        data: { view: 'call-logs' }
       },
       {
         target: '.tour-modal-transcript-tab',
         title: 'Transcript Tab',
         content: 'Read the full transcription of the conversation here.',
         placement: 'bottom',
-        spotlightPadding: 4,        data: { view: 'call-logs' }
       },
     ];
 
@@ -102,7 +97,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
           title: 'Enter Token',
           content: 'Paste the GoHighLevel Private Integration Token here.',
           placement: 'bottom',
-          spotlightPadding: 4,
           data: { view: 'sub-accounts' }
         },
         {
@@ -110,7 +104,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
           title: 'Save Token',
           content: 'Save the token to enable integration.',
           placement: 'bottom',
-          spotlightPadding: 4,
           data: { view: 'sub-accounts' }
         },
         {
@@ -125,7 +118,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
           title: t('tutorial.userEmailTitle') || 'User Email',
           content: t('tutorial.userEmail') || 'Enter the email address for the new user.',
           placement: 'bottom',
-          spotlightPadding: 4,
           data: { view: 'users' }
         },
         {
@@ -133,7 +125,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
           title: t('tutorial.userPasswordTitle') || 'User Password',
           content: t('tutorial.userPassword') || 'Set a secure password for the new user.',
           placement: 'bottom',
-          spotlightPadding: 4,
           data: { view: 'users' }
         },
         {
@@ -141,7 +132,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
           title: t('tutorial.userRoleTitle') || 'User Role',
           content: t('tutorial.userRole') || 'Choose between Client (restricted access) and Admin (full access).',
           placement: 'bottom',
-          spotlightPadding: 4,
           data: { view: 'users' }
         },
         {
@@ -149,7 +139,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
           title: t('tutorial.userLocationTitle') || 'Assigned Location',
           content: t('tutorial.userLocation') || 'For clients, assign the specific sub-account they can view.',
           placement: 'bottom',
-          spotlightPadding: 4,
           data: { view: 'users' }
         },
         {
@@ -175,7 +164,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
         title: t('tutorial.settingsApiKeyTitle') || 'Agency API Key',
         content: t('tutorial.settingsApiKey') || 'Update your GoHighLevel Agency API key here to keep sub-accounts synced.',
         placement: 'bottom',
-        spotlightPadding: 4,
         data: { view: 'settings' }
       } as Step]),
       {
@@ -183,7 +171,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
         title: t('tutorial.settingsPasswordTitle') || 'Change Password',
         content: t('tutorial.settingsPassword') || 'Update your account password for security.',
         placement: 'bottom',
-        spotlightPadding: 4,
         data: { view: 'settings' }
       },
       {
@@ -191,7 +178,6 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
         title: t('tutorial.datePickerTitle') || 'Time Filters',
         content: t('tutorial.datePicker') || 'Filter your data by selecting a date range.',
         placement: 'bottom',
-        spotlightPadding: 4,
         data: { view: 'call-logs' }
       },
       {
@@ -203,13 +189,13 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
       }
     );
 
-    setSteps(baseSteps.map(step => ({ disableBeacon: true, skipBeacon: true, spotlightPadding: 0, ...step })) as Step[]);
+    setSteps(baseSteps.map(step => ({ disableBeacon: true, skipBeacon: true, spotlightPadding: 8, spotlightBorderRadius: 16, ...step })) as Step[]);
   }, [t, isClientMode]);
 
   const handleJoyrideCallback = (data: EventData) => {
     const { status, type, step, action } = data;
     
-    if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
+    if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status) || action === 'close') {
       onFinish();
     }
 
@@ -246,7 +232,7 @@ export function Tutorial({ run, onFinish, isClientMode, currentView, onViewChang
       continuous
       onEvent={handleJoyrideCallback}
       options={{ 
-        zIndex: 10000,
+        zIndex: 100000,
         overlayColor: 'rgba(0, 0, 0, 0.5)',
         arrowColor: '#ffffff',
         

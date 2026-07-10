@@ -23,7 +23,6 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       const data = await login(email, password);
       onLoginSuccess(data.user);
@@ -35,40 +34,41 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative font-sans">
       <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
         <button
           onClick={toggleLanguage}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors text-sm font-medium shadow-sm"
+          className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white text-slate-500 hover:text-slate-900 transition-colors text-sm font-semibold shadow-sm border border-slate-200"
           title="Toggle Language"
         >
-          <Globe className="w-4 h-4 text-slate-400" />
+          <Globe className="w-4 h-4" />
           <span>{language === 'en' ? 'EN' : 'ES'}</span>
         </button>
       </div>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-md">
-            <Building2 className="w-6 h-6 text-white" />
+          <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-900/20">
+            <Building2 className="w-7 h-7 text-white" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-slate-900">{t("login.subtitle")}</h2>
-        <p className="mt-2 text-center text-sm text-slate-600">{t("login.portal")}</p>
+        <h2 className="mt-8 text-center text-3xl font-black tracking-tight text-slate-900">{t("login.subtitle")}</h2>
+        <p className="mt-3 text-center text-sm font-medium text-slate-500">{t("login.portal")}</p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm sm:rounded-xl sm:px-10 border border-slate-200">
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-10 px-4 shadow-xl shadow-slate-200/50 sm:rounded-3xl sm:px-12 border border-slate-100">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-100 text-center">
+              <div className="bg-rose-50 text-rose-700 p-4 rounded-xl text-sm border border-rose-100 text-center font-medium">
                 {error}
               </div>
             )}
             
             <div>
-              <label className="block text-sm font-medium text-slate-700">{t("login.emailAddress")}</label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{t("login.emailAddress")}</label>
+              <div className="mt-2 relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
@@ -76,16 +76,16 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 bg-white border border-slate-300 rounded-md py-2 text-sm shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="block w-full pl-11 bg-slate-50 border border-slate-200 rounded-xl py-3.5 text-sm font-medium focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all"
                   placeholder="user@example.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700">{t("login.password")}</label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{t("login.password")}</label>
+              <div className="mt-2 relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
@@ -93,17 +93,17 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 bg-white border border-slate-300 rounded-md py-2 text-sm shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="block w-full pl-11 bg-slate-50 border border-slate-200 rounded-xl py-3.5 text-sm font-medium focus:ring-4 focus:ring-slate-100 focus:border-slate-400 outline-none transition-all"
                   placeholder="••••••••"
                 />
               </div>
             </div>
 
-            <div>
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+                className="w-full flex justify-center items-center py-3.5 px-4 rounded-xl shadow-md text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-200 disabled:opacity-50 transition-all active:scale-[0.98]"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('login.signIn')}
               </button>

@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import { MoreVertical } from 'lucide-react';
-import { format } from 'date-fns';
+import React, { useState } from 'react';
 import { CallLog } from '../types';
-import { cn } from '../lib/utils';
 import { Agent } from '../api';
+import { format } from 'date-fns';
+import { Filter, ChevronDown, ChevronUp, AlignLeft, FileText, Info, Play, Search, Clock, FileText as TranscriptIcon } from 'lucide-react';
+import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface CallsTableProps {
+  onOpenSummary: (call: CallLog) => void;
   calls: CallLog[];
   agents: Agent[];
-  onOpenSummary: (call: CallLog) => void;
+  
 }
 
 const statusColors: Record<string, string> = {
   'Human Answered': 'bg-emerald-100 text-emerald-700',
   'Voicemail': 'bg-amber-100 text-amber-700',
   'Failed': 'bg-rose-100 text-rose-700',
-  'No Answer': 'bg-slate-100 text-slate-600',
 };
 
 function formatDuration(seconds: number) {
@@ -25,89 +25,115 @@ function formatDuration(seconds: number) {
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
-export function CallsTable({ calls, agents, onOpenSummary }: CallsTableProps) {
+export function CallsTable({ onOpenSummary, calls, agents }: CallsTableProps) {
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
-  
-  const filteredCalls = calls.filter(call => 
-    call.contactName.toLowerCase().includes(searchTerm.toLowerCase())
+
+  const filteredCalls = calls.filter(c => 
+    c.contactName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    c.contactId.includes(searchTerm)
   );
 
-  const getAgentName = (agentId: string) => {
-    const agent = agents.find(a => a.id === agentId);
-    return agent ? agent.name : t("app.unknownAgent");
-  };
-
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col flex-1 min-h-[300px]">
-      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/50 px-4 shrink-0">
-        <div className="flex">
-          <button 
-            className="px-4 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600"
-          >
-            {t("metrics.attempted")}
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col min-h-[400px]">
+      <div className="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white rounded-t-2xl shrink-0">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">{t("callsTable.recentCalls")}</h2>
+        
+        <div className="flex space-x-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-64 tour-search-field">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder={t("callsTable.searchPlaceholder")}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 pr-4 py-2 w-full border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-slate-100 focus:border-slate-400 bg-slate-50 transition-all font-medium placeholder:font-normal"
+            />
+          </div>
+          <button className="flex items-center px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-colors font-semibold shadow-sm bg-white">
+            <Filter className="w-4 h-4 mr-2 text-slate-400" />
+            {t("callsTable.filter")}
           </button>
         </div>
-        <div className="flex items-center space-x-2 py-2 tour-search-field">
-          <input 
-            type="text" 
-            placeholder={t("callsTable.search")} 
-            className="text-xs border border-slate-300 rounded px-3 py-1.5 w-48 outline-none focus:border-blue-500"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
       </div>
-      <div className="overflow-auto flex-1">
-        <table className="w-full text-left border-collapse table-fixed min-w-[900px]">
-          <thead className="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase sticky top-0">
-            <tr className="border-b border-slate-200">
-              <th className="px-4 py-3">{t("callsTable.contact")}</th>
-              <th className="px-4 py-3">{t("callsTable.agent")}</th>
-              <th className="px-4 py-3 w-32">{t("callsTable.status")}</th>
-              <th className="px-4 py-3">{t("callsTable.date")}</th>
-              <th className="px-4 py-3 w-20">{t("callsTable.duration")}</th>
-              <th className="px-4 py-3">{t("callsTable.actions")}</th>
-              <th className="px-4 py-3 w-32 text-right"></th>
+
+      <div className="overflow-x-auto flex-1 bg-white">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-slate-50/80 text-xs font-bold text-slate-400 uppercase tracking-widest sticky top-0 z-10 backdrop-blur-sm border-b border-slate-200">
+            <tr>
+              <th className="px-5 py-4 whitespace-nowrap">{t("callsTable.contact")}</th>
+              <th className="px-5 py-4 whitespace-nowrap">{t("callsTable.agent")}</th>
+              <th className="px-5 py-4 whitespace-nowrap">{t("callsTable.status")}</th>
+              <th className="px-5 py-4 whitespace-nowrap">{t("callsTable.date")}</th>
+              <th className="px-5 py-4 whitespace-nowrap">{t("callsTable.duration")}</th>
+              <th className="px-5 py-4 whitespace-nowrap text-right">{t("callsTable.actions")}</th>
             </tr>
           </thead>
-          <tbody className="text-xs text-slate-600 font-medium">
-            {filteredCalls.map(call => (
-              <tr key={call.id} className="border-b border-slate-100 hover:bg-slate-50/50">
-                <td className="px-4 py-2.5 font-bold text-slate-900">{call.contactName}</td>
-                <td className="px-4 py-2.5 text-slate-700">{getAgentName(call.agentId)}</td>
-                <td className="px-4 py-2.5">
-                  <span className={cn("px-2 py-1 rounded-full text-[10px] font-bold whitespace-nowrap", statusColors[call.status])}>
-                    {call.status}
-                  </span>
-                </td>
-                <td className="px-4 py-2.5">{format(new Date(call.createdAt), 'MMM dd, hh:mm a')}</td>
-                <td className="px-4 py-2.5 font-mono">{formatDuration(call.duration)}</td>
-                <td className="px-4 py-2.5 truncate">{call.callDirection}</td>
-                <td className="px-4 py-2.5 text-right space-x-1.5 flex items-center justify-end">
-                  <button 
+          <tbody className="text-sm">
+            {filteredCalls.map((call) => {
+              const agentName = agents.find(a => a.id === call.agentId)?.name || call.agentId;
+              
+              return (
+                <React.Fragment key={call.id}>
+                  <tr 
+                    className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors group cursor-pointer"
                     onClick={() => onOpenSummary(call)}
-                    className="px-2 py-1 bg-blue-50 text-blue-600 rounded border border-blue-100 hover:bg-blue-100 transition-colors tour-summary-button"
                   >
-                    {t("callsTable.summary")}
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    <td className="px-5 py-4">
+                      <div className="font-semibold text-slate-900 group-hover:text-slate-900 transition-colors">{call.contactName}</div>
+                      <div className="text-xs font-mono text-slate-400 mt-0.5">{call.contactId}</div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="font-medium text-slate-700">{agentName}</div>
+                      <div className="text-[10px] uppercase tracking-widest text-slate-400 mt-1 font-bold">{call.callDirection}</div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className={cn("px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shadow-sm border border-transparent", statusColors[call.status] || 'bg-slate-100 text-slate-700')}>
+                        {call.status}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-slate-500 font-medium">{format(new Date(call.createdAt), 'MMM dd, h:mm a')}</td>
+                    <td className="px-5 py-4 font-mono text-slate-500 font-medium">
+                      <div className="flex items-center">
+                        <Clock className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
+                        {formatDuration(call.duration)}
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenSummary(call);
+                        }}
+                        className="inline-flex items-center px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm hover:bg-slate-800 hover:-translate-y-0.5 transition-all tour-summary-button active:translate-y-0"
+                      >
+                        <TranscriptIcon className="w-3.5 h-3.5 mr-1.5" />
+                        {t("callsTable.summary")}
+                      </button>
+                    </td>
+                  </tr>
+                </React.Fragment>
+              );
+            })}
             {filteredCalls.length === 0 && (
-              <tr className="tour-summary-button">
-                <td colSpan={7} className="px-4 py-8 text-center text-slate-500">{t("callsTable.noCalls")}</td>
+              <tr>
+                <td colSpan={6} className="px-5 py-16 text-center text-slate-400 font-medium text-sm">
+                  {t("callsTable.noCalls")}
+                </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-      <div className="h-12 border-t border-slate-200 flex items-center justify-between px-4 shrink-0 bg-slate-50/50">
-        <span className="text-xs text-slate-500 font-medium">{t("callsTable.showing", { count: filteredCalls.length, total: filteredCalls.length })}</span>
-        <div className="flex space-x-1">
-          <button className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded text-slate-400">&laquo;</button>
-          <button className="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded font-bold">1</button>
-          <button className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded text-slate-400">&raquo;</button>
+      
+      <div className="h-14 border-t border-slate-200 flex items-center justify-between px-5 shrink-0 bg-white rounded-b-2xl">
+        <span className="text-sm text-slate-500 font-medium">
+          {t("callsTable.showing", { count: filteredCalls.length, total: filteredCalls.length })}
+        </span>
+        <div className="flex space-x-2">
+          <button className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors shadow-sm">&laquo;</button>
+          <button className="w-8 h-8 flex items-center justify-center bg-slate-900 text-white rounded-lg font-bold shadow-md">1</button>
+          <button className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors shadow-sm">&raquo;</button>
         </div>
       </div>
     </div>
