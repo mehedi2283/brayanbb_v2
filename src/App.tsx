@@ -30,6 +30,7 @@ export default function App() {
   const [selectedCall, setSelectedCall] = useState<CallLog | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [apiWarning, setApiWarning] = useState<string | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [currentView, setCurrentView] = useState<'call-logs' | 'sub-accounts' | 'settings' | 'users'>('call-logs');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
@@ -76,28 +77,31 @@ useEffect(() => {
     }
   }, [selectedLocationId]);
 
-  useEffect(() => {
+  const refreshLocations = async () => {
     if (!user) return;
-
     setLoading(true);
-    fetchLocations().then(locs => {
-      setLocations(locs);
-      
-      if (locs.length > 0) {
-        if (!selectedLocationId || !locs.find(l => l.id === selectedLocationId)) {
-          if (user?.role !== 'client') {
-            setSelectedLocationId(locs[0].id);
-          } else {
-            // For clients, if they have a single location assigned, lock to it
-            setSelectedLocationId(locs[0].id);
-          }
+    try {
+      const res = await fetchLocations();
+      setLocations(res.locations);
+      if (res.warning) {
+        setApiWarning(res.warning);
+      } else {
+        setApiWarning(null);
+      }
+      if (res.locations.length > 0) {
+        if (!selectedLocationId || !res.locations.find(l => l.id === selectedLocationId)) {
+          setSelectedLocationId(res.locations[0].id);
         }
       }
-      setLoading(false);
-    }).catch(err => {
+    } catch (err) {
       console.error(err);
+    } finally {
       setLoading(false);
-    });
+    }
+  };
+
+  useEffect(() => {
+    refreshLocations();
   }, [user, currentView]);
 
   useEffect(() => {
@@ -224,8 +228,32 @@ useEffect(() => {
         />
         
         <div className="p-5 space-y-5 overflow-auto flex-1 relative">
+          {apiWarning && (
+            <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-md shadow-sm mb-4 flex items-start justify-between">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 mt-0.5">
+                  <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-amber-700">
+                    {apiWarning}
+                  </p>
+                </div>
+              </div>
+              {!isClientMode && (
+                <button
+                  onClick={() => setCurrentView('settings')}
+                  className="ml-4 flex-shrink-0 px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-medium rounded-md transition-colors"
+                >
+                  Update Settings
+                </button>
+              )}
+            </div>
+          )}
           {currentView === 'settings' ? (
-            <SettingsView user={user} onRestartTutorial={() => setRunTutorial(true)} />
+            <SettingsView user={user} onRestartTutorial={() => setRunTutorial(true)} onAgencyKeyUpdated={refreshLocations} />
           ) : currentView === 'sub-accounts' ? (
             <SubAccountsView 
               locations={locations} 

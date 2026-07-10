@@ -62,6 +62,7 @@ const User = mongoose.model('User', UserSchema);
 const SubAccountTokenSchema = new mongoose.Schema({
   locationId: { type: String, required: true, unique: true, index: true },
   pitToken: { type: String, required: true },
+  locationName: { type: String },
   updatedAt: { type: Date, default: Date.now }
 });
 
@@ -239,12 +240,27 @@ app.post('/api/agency-key', requireAdmin, async (req, res) => {
   if (!agencyApiKey) return res.status(400).json({ error: 'agencyApiKey is required' });
 
   try {
+    // Verify the key first by attempting to fetch locations
+    const response = await fetch('https://services.leadconnectorhq.com/locations/search', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${agencyApiKey}`,
+        Version: '2021-07-28',
+        Accept: 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      return res.status(400).json({ error: 'Invalid Agency API Key. Verification failed.' });
+    }
+
+    // Save to database since it's verified
     await AgencyConfig.findOneAndUpdate(
       { id: 'default' },
       { agencyApiKey, updatedAt: Date.now() },
       { new: true, upsert: true }
     );
-    res.json({ success: true, message: 'Agency API key saved successfully' });
+    res.json({ success: true, message: 'Agency API key verified and saved successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -282,14 +298,18 @@ app.get('/api/tokens/:locationId/status', requireAdmin, async (req, res) => {
 
 app.post('/api/tokens/:locationId', requireAdmin, async (req, res) => {
   const { locationId } = req.params;
-  const { pitToken } = req.body;
+  const { pitToken, locationName } = req.body;
   if (!locationId) return res.status(400).json({ error: 'locationId is required' });
   if (!pitToken) return res.status(400).json({ error: 'pitToken is required' });
 
   try {
+    const updateData = { pitToken, updatedAt: Date.now() };
+    if (locationName) {
+      updateData.locationName = locationName;
+    }
     await SubAccountToken.findOneAndUpdate(
       { locationId },
-      { pitToken, updatedAt: Date.now() },
+      updateData,
       { new: true, upsert: true }
     );
     res.json({ success: true, message: 'Sub-account PIT token saved successfully', locationId });
@@ -307,7 +327,14 @@ app.post('/api/tokens/:locationId', requireAdmin, async (req, res) => {
 app.get('/api/locations', authenticateToken, async (req, res) => {
   try {
     const token = await getAgencyToken();
-    if (!token) return res.status(401).json({ error: 'No Agency API Key configured' });
+    if (!token) {
+      let storedTokens = await SubAccountToken.find({});
+      if (req.user.role === 'client') {
+        storedTokens = storedTokens.filter(t => t.locationId === req.user.locationId);
+      }
+      const storedLocations = storedTokens.map(t => ({ locationId: t.locationId, name: t.locationName || t.locationId }));
+      return res.status(401).json({ error: 'No Agency API Key configured', storedLocations });
+    }
 
     const response = await fetch('https://services.leadconnectorhq.com/locations/search', {
       method: 'GET',
@@ -319,7 +346,14 @@ app.get('/api/locations', authenticateToken, async (req, res) => {
     });
 
     const data = await response.json();
-    if (!response.ok) return res.status(response.status).json(data);
+    if (!response.ok) {
+      let storedTokens = await SubAccountToken.find({});
+      if (req.user.role === 'client') {
+        storedTokens = storedTokens.filter(t => t.locationId === req.user.locationId);
+      }
+      const storedLocations = storedTokens.map(t => ({ locationId: t.locationId, name: t.locationName || t.locationId }));
+      return res.status(response.status).json({ ...data, storedLocations });
+    }
     
     // If the user is a client, only return their specific location
     if (req.user.role === 'client') {
@@ -330,10 +364,18 @@ app.get('/api/locations', authenticateToken, async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Failed to fetch locations:', err);
-    res.status(500).json({ error: 'Failed to fetch locations' });
+    try {
+      let storedTokens = await SubAccountToken.find({});
+      if (req.user.role === 'client') {
+        storedTokens = storedTokens.filter(t => t.locationId === req.user.locationId);
+      }
+      const storedLocations = storedTokens.map(t => ({ locationId: t.locationId, name: t.locationName || t.locationId }));
+      res.status(500).json({ error: 'Failed to fetch locations', storedLocations });
+    } catch (dbErr) {
+      res.status(500).json({ error: 'Failed to fetch locations' });
+    }
   }
 });
-
 app.get('/api/call-logs', authenticateToken, async (req, res) => {
   const { locationId } = req.query;
   if (!locationId || typeof locationId !== 'string') return res.status(400).json({ error: 'locationId is required' });

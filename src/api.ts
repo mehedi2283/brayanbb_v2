@@ -69,21 +69,35 @@ export async function changePassword(oldPassword: string, newPassword: string) {
   return data;
 }
 
-export async function fetchLocations(): Promise<Location[]> {
+export async function fetchLocations(): Promise<{ locations: Location[], warning?: string }> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/locations`, { headers: authHeaders() });
-    if (!res.ok) throw new Error('Failed to fetch locations');
-    const data = await res.json();
+    const text = await res.text();
+    let data: any = {};
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      // Not JSON
+    }
     
+    let locations: Location[] = [];
     if (data.locations && Array.isArray(data.locations)) {
-      return data.locations.map((loc: any) => ({ id: loc.id, name: loc.name }));
+      locations = data.locations.map((loc: any) => ({ id: loc.id, name: loc.name }));
+    } else if (data.location) {
+      locations = [{ id: data.location.id, name: data.location.name }];
+    } else if (data.storedLocations && Array.isArray(data.storedLocations)) {
+      locations = data.storedLocations.map((loc: any) => ({ id: loc.locationId || loc.id, name: loc.name || loc.locationId || 'Unknown' }));
     }
-    if (data.location) {
-      return [{ id: data.location.id, name: data.location.name }];
+
+    if (!res.ok) {
+      return { 
+        locations, 
+        warning: 'The API has been changed or deleted in GHL. Please update the API to get updated subaccount data.'
+      };
     }
-    return [];
-  } catch (error) {
-    return [];
+    return { locations };
+  } catch (error: any) {
+    return { locations: [], warning: 'Failed to fetch locations: ' + error.message };
   }
 }
 

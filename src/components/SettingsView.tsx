@@ -6,9 +6,10 @@ import { API_BASE_URL, authHeaders, changePassword } from '../api';
 interface SettingsViewProps {
   user: any;
   onRestartTutorial: () => void;
+  onAgencyKeyUpdated?: () => void;
 }
 
-export function SettingsView({ user, onRestartTutorial }: SettingsViewProps) {
+export function SettingsView({ user, onRestartTutorial, onAgencyKeyUpdated }: SettingsViewProps) {
   const { t, language, setLanguage } = useLanguage();
   const [agencyKey, setAgencyKey] = useState('');
   const [savingKey, setSavingKey] = useState(false);
@@ -32,6 +33,7 @@ export function SettingsView({ user, onRestartTutorial }: SettingsViewProps) {
       if (res.ok) {
         setKeyMessage(t('settings.keySaved'));
         setAgencyKey('');
+        if (onAgencyKeyUpdated) onAgencyKeyUpdated();
       } else {
         setKeyMessage(data.error || t('settings.keyFailed'));
       }

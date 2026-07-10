@@ -1,0 +1,1 @@
+sed -i 's/  const \[errorMsg, setErrorMsg\] = useState<string | null>(null);/  const \[errorMsg, setErrorMsg\] = useState<string | null>(null);\n  const \[apiWarning, setApiWarning\] = useState<string | null>(null);/' src/App.tsx

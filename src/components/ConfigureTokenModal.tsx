@@ -35,7 +35,7 @@ export function ConfigureTokenModal({ location, onClose, onSuccess }: ConfigureT
       await fetch(`${API_BASE_URL}/api/tokens/${location.id}`, {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify({ pitToken: editTokenValue })
+        body: JSON.stringify({ pitToken: editTokenValue, locationName: location.name })
       });
       onSuccess(editTokenValue);
     } catch (e) {
